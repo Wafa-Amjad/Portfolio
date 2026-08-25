@@ -1,0 +1,529 @@
+{
+  "profile": {
+    "name": "Wafa Amjad",
+    "title": "Computer Science Student | Full Stack Developer",
+    "location": "Abbottabad, KPK, Pakistan",
+    "email": "wafaamjad058@gmail.com",
+    "bio": "I am a Computer Science undergraduate at COMSATS University Islamabad, Abbottabad Campus, with practical experience in building full-stack web and mobile applications. I specialize in designing backend REST APIs, optimizing relational and non-relational databases, and crafting responsive user interfaces. I love solving algorithmic challenges and applying modern software engineering principles to real-world systems.",
+    "long_bio": "Pursuing my BS in Computer Science (2023-2027), I have developed a strong foundation in Object-Oriented Programming, Data Structures, Algorithms, and Software Architecture. As a developer, I aim to build secure, robust, and scalable solutions that bridge the gap between high-level engineering designs and everyday utility. Through academic projects and professional internships, I have completed multiple full-stack systems with authentication, database integration, and high performance.",
+    "github_url": "https://github.com/wafaamjad",
+    "linkedin_url": "https://linkedin.com/in/wafaamjad",
+    "resume_url": "#",
+    "profile_image": ""
+  },
+  "projects": [
+    {
+      "id": "p1",
+      "title": "Password Validation System",
+      "short_description": "A C-language tool demonstrating password rules enforcement and input validation.",
+      "detailed_description": "A programming system designed to validate passwords based on custom rules (length, upper/lowercase count, numeric presence, and special characters). It highlights fundamental C programming concepts, structural programming practices, string analysis, and low-level character parsing. Built to show command-line interface validation logic.",
+      "category": "Programming Fundamentals",
+      "technologies": [
+        "C",
+        "String Parsing",
+        "Algorithms"
+      ],
+      "image_url": "",
+      "github_url": "https://github.com/wafaamjad/password-validation",
+      "live_url": "",
+      "featured": false,
+      "project_date": "2023-11-15",
+      "highlights": [
+        "String processing algorithms in standard C",
+        "Multiple complexity-rule checking strategies",
+        "Robust input validation against buffers and special inputs"
+      ],
+      "role": "Lead Developer",
+      "database_tech": "None",
+      "project_type": "Academic Project"
+    },
+    {
+      "id": "p2",
+      "title": "Flight Reservation System",
+      "short_description": "A console-based reservation management application written in C.",
+      "detailed_description": "A terminal application developed in C to control mock flight records, passenger seating assignments, reservations, and ticket cancellations. Demonstrates file handling for data persistence, struct layout for object definition, and custom record search and updates using terminal interfaces.",
+      "category": "Console Systems",
+      "technologies": [
+        "C",
+        "File I/O",
+        "Data Structures"
+      ],
+      "image_url": "",
+      "github_url": "https://github.com/wafaamjad/flight-reservation",
+      "live_url": "",
+      "featured": false,
+      "project_date": "2024-01-10",
+      "highlights": [
+        "Dynamic flight schedule scheduling and database simulation via binary file file I/O",
+        "Interactive passenger boarding and ticketing lists",
+        "Algorithmic seating chart mapping in standard Terminal output"
+      ],
+      "role": "Developer",
+      "database_tech": "Binary Text Files",
+      "project_type": "Academic Project"
+    },
+    {
+      "id": "p3",
+      "title": "Blood Bank Management System",
+      "short_description": "A database-driven Java application for managing blood inventory and requests.",
+      "detailed_description": "An interactive desktop application built with Java Swing for administrative actions and a relational SQL database. It covers donor registration, matching blood type requirements, monitoring current inventory levels, tracking medical checkups, and record search. It uses JDBC for standard integration to run queries, store records, and retrieve reports.",
+      "category": "Desktop App",
+      "technologies": [
+        "Java",
+        "SQL Server",
+        "JDBC",
+        "Java Swing"
+      ],
+      "image_url": "",
+      "github_url": "https://github.com/wafaamjad/blood-bank-management",
+      "live_url": "",
+      "featured": false,
+      "project_date": "2024-05-20",
+      "highlights": [
+        "Connected Java GUI with SQL server for secure CRUD transactions",
+        "Search queries with complex SQL filters regarding donor availability",
+        "State rendering to track blood group inventory alerts and shortages"
+      ],
+      "role": "Database & Java Programmer",
+      "database_tech": "SQL Server",
+      "project_type": "Academic Project"
+    },
+    {
+      "id": "p4",
+      "title": "Lost and Found Portal",
+      "short_description": "A full-stack tracking service application using React, Node, and Supabase.",
+      "detailed_description": "A full-stack web application designed for campus crowdsourcing. It provides platforms where students can report lost property and claim discovered goods. Features include filters, categories, photo upload, and instant verification claims. Built with React for frontend rendering and Node/Express REST APIs for connecting to a Supabase database.",
+      "category": "Full Stack",
+      "technologies": [
+        "React.js",
+        "Node.js",
+        "Express.js",
+        "Supabase",
+        "CSS"
+      ],
+      "image_url": "",
+      "github_url": "https://github.com/wafaamjad/lost-and-found",
+      "live_url": "",
+      "featured": true,
+      "project_date": "2025-12-10",
+      "highlights": [
+        "Responsive React frontend querying Express REST backend",
+        "Secure Supabase storage for uploading snapshots of found objects",
+        "Sorting/search by keyword, status (lost/found), and date"
+      ],
+      "role": "Full-Stack Developer",
+      "database_tech": "Supabase PostgreSQL",
+      "project_type": "Personal Project"
+    },
+    {
+      "id": "p5",
+      "title": "Random Quote Generator",
+      "short_description": "A quote delivery web client built on React, Express, and MongoDB.",
+      "detailed_description": "A lightweight, dynamic application retrieving quotes based on author or category. Users can save quotes local, generate random items, or browse catalog details. Key operations are configured on a Node/Express backend that accesses MongoDB tables with Mongoose.",
+      "category": "Full Stack",
+      "technologies": [
+        "React.js",
+        "Node.js",
+        "Express.js",
+        "MongoDB",
+        "CSS"
+      ],
+      "image_url": "",
+      "github_url": "https://github.com/wafaamjad/quote-generator",
+      "live_url": "",
+      "featured": false,
+      "project_date": "2025-08-05",
+      "highlights": [
+        "Internship project during full-stack contract",
+        "Mongoose aggregation queries retrieve quick random rows",
+        "Shareable links configuration for social pages"
+      ],
+      "role": "Intern Developer",
+      "database_tech": "MongoDB",
+      "project_type": "Internship Project"
+    },
+    {
+      "id": "p6",
+      "title": "Flashcard Quiz App",
+      "short_description": "Interactive study card trainer using React, Node, and MongoDB.",
+      "detailed_description": "A flashcard-based self-testing app providing quizzes across technical categories. Includes a custom session builder, countdown timers, responsive card flip animations, and real-time score keeping. Integrated with a REST API backend saving performance and card items into a cloud MongoDB instance.",
+      "category": "Full Stack",
+      "technologies": [
+        "React.js",
+        "Node.js",
+        "Express.js",
+        "MongoDB",
+        "CSS"
+      ],
+      "image_url": "",
+      "github_url": "https://github.com/wafaamjad/flashcard-quiz",
+      "live_url": "",
+      "featured": true,
+      "project_date": "2025-08-20",
+      "highlights": [
+        "Dynamic categorization mechanism for study sessions",
+        "Real-time countdown timer tracking test compliance",
+        "Clean, interactive CSS animations for flipping cards"
+      ],
+      "role": "Intern Developer",
+      "database_tech": "MongoDB",
+      "project_type": "Internship Project"
+    },
+    {
+      "id": "p7",
+      "title": "Sudoku Game",
+      "short_description": "A Python puzzle builder and automated solver based on Backtracking.",
+      "detailed_description": "An interactive Sudoku board game designed in Python. Users can play levels or click a button to view an instant solution. Solver logic is powered by a backtracking algorithm that visualizes constraint solving dynamically, demonstrating algorithmic speed and state manipulation.",
+      "category": "Python Systems",
+      "technologies": [
+        "Python",
+        "Algorithms",
+        "GUI Framework"
+      ],
+      "image_url": "",
+      "github_url": "https://github.com/wafaamjad/sudoku-python",
+      "live_url": "",
+      "featured": false,
+      "project_date": "2024-04-18",
+      "highlights": [
+        "Backtracking solver resolving grid constraints under 50ms",
+        "Interactive grid UI handling cell entry validations",
+        "Dynamic game board state generating novel boards on request"
+      ],
+      "role": "Developer",
+      "database_tech": "None",
+      "project_type": "Academic Project"
+    },
+    {
+      "id": "p8",
+      "title": "Campus Utility Management System",
+      "short_description": "A complaint tracking system with role authentication and protected states.",
+      "detailed_description": "An enterprise-grade campus utility tracker connecting students, staff, and technicians. Students submit maintenance requests and ticket complaints, while administrators assign engineers to tickets and technicians modify resolution statuses. The React customer interface protects views using JWT auth cookies.",
+      "category": "Full Stack",
+      "technologies": [
+        "React.js",
+        "Node.js",
+        "Express.js",
+        "MongoDB",
+        "CSS"
+      ],
+      "image_url": "",
+      "github_url": "https://github.com/wafaamjad/campus-utility",
+      "live_url": "",
+      "featured": true,
+      "project_date": "2026-02-15",
+      "highlights": [
+        "Designed role-based access logic for three different roles",
+        "Interactive dashboard for tracking status transitions of claims",
+        "Automated request timestamps and history audit pages"
+      ],
+      "role": "Full-Stack Intern",
+      "database_tech": "MongoDB",
+      "project_type": "Internship Project"
+    },
+    {
+      "id": "p9",
+      "title": "Commutas — Smart Transit Mobile App",
+      "short_description": "A transit tracking mobile application using Flutter and Supabase.",
+      "detailed_description": "A mobile routing application for campus transit, providing GPS bus tracking, seat vacancy analysis, and a digital fare wallet. The project includes NFC-based contactless fare collection, integrated fallback QR codes, route maps, and a web admin dashboard.",
+      "category": "Mobile App",
+      "technologies": [
+        "Flutter",
+        "Dart",
+        "Supabase",
+        "NFC Integration",
+        "Google Maps"
+      ],
+      "image_url": "",
+      "github_url": "https://github.com/wafaamjad/commutas",
+      "live_url": "",
+      "featured": true,
+      "project_date": "2025-10-30",
+      "highlights": [
+        "Cross-platform Flutter app integrated with Supabase Realtime tracking",
+        "Contactless fare updates utilizing NFC cards with instant wallet sync",
+        "Administrative analytics panel managing fleet records and boarding stats"
+      ],
+      "role": "Mobile Developer",
+      "database_tech": "Supabase PostgreSQL",
+      "project_type": "Personal Project"
+    },
+    {
+      "id": "p10",
+      "title": "Campus Ride Sharing Platform",
+      "short_description": "A ride-matching platform built with React, Node, and SQL Server.",
+      "detailed_description": "A full-scale ride sharing platform tailored for university students and faculty. Drivers publish open seats on transit plans while passengers search corresponding paths to join rides. The three-role dashboard manages authentication, rides tracking, distance matching, and status logging.",
+      "category": "Full Stack",
+      "technologies": [
+        "React.js",
+        "Node.js",
+        "Express.js",
+        "SQL Server",
+        "CSS"
+      ],
+      "image_url": "",
+      "github_url": "https://github.com/wafaamjad/campus-ride-sharing",
+      "live_url": "",
+      "featured": true,
+      "project_date": "2026-01-25",
+      "highlights": [
+        "Three-role authentication: Admin, Driver, and Passenger dashboards",
+        "Relational route design using complex SQL Server indexing",
+        "Secure REST endpoints verify rider-passenger match parameters"
+      ],
+      "role": "Backend Architect & Developer",
+      "database_tech": "SQL Server",
+      "project_type": "Internship Project"
+    }
+  ],
+  "skills": [
+    {
+      "id": "s1",
+      "name": "C",
+      "category": "Programming Languages",
+      "proficiency": 90,
+      "display_order": 1
+    },
+    {
+      "id": "s2",
+      "name": "C++",
+      "category": "Programming Languages",
+      "proficiency": 85,
+      "display_order": 2
+    },
+    {
+      "id": "s3",
+      "name": "Java",
+      "category": "Programming Languages",
+      "proficiency": 80,
+      "display_order": 3
+    },
+    {
+      "id": "s4",
+      "name": "Python",
+      "category": "Programming Languages",
+      "proficiency": 85,
+      "display_order": 4
+    },
+    {
+      "id": "s5",
+      "name": "JavaScript",
+      "category": "Programming Languages",
+      "proficiency": 90,
+      "display_order": 5
+    },
+    {
+      "id": "s6",
+      "name": "C#",
+      "category": "Programming Languages",
+      "proficiency": 75,
+      "display_order": 6
+    },
+    {
+      "id": "s7",
+      "name": "SQL",
+      "category": "Programming Languages",
+      "proficiency": 85,
+      "display_order": 7
+    },
+    {
+      "id": "s8",
+      "name": "Dart",
+      "category": "Programming Languages",
+      "proficiency": 80,
+      "display_order": 8
+    },
+    {
+      "id": "s9",
+      "name": "Flutter",
+      "category": "Programming Languages",
+      "proficiency": 85,
+      "display_order": 9
+    },
+    {
+      "id": "s10",
+      "name": "Verilog",
+      "category": "Programming Languages",
+      "proficiency": 60,
+      "display_order": 10
+    },
+    {
+      "id": "s11",
+      "name": "HTML & CSS",
+      "category": "Web Development",
+      "proficiency": 95,
+      "display_order": 11
+    },
+    {
+      "id": "s12",
+      "name": "React.js",
+      "category": "Web Development",
+      "proficiency": 90,
+      "display_order": 12
+    },
+    {
+      "id": "s13",
+      "name": "Node.js",
+      "category": "Web Development",
+      "proficiency": 85,
+      "display_order": 13
+    },
+    {
+      "id": "s14",
+      "name": "Express.js",
+      "category": "Web Development",
+      "proficiency": 88,
+      "display_order": 14
+    },
+    {
+      "id": "s15",
+      "name": "Bootstrap",
+      "category": "Web Development",
+      "proficiency": 85,
+      "display_order": 15
+    },
+    {
+      "id": "s16",
+      "name": "Supabase / PostgreSQL",
+      "category": "Databases",
+      "proficiency": 85,
+      "display_order": 16
+    },
+    {
+      "id": "s17",
+      "name": "MongoDB",
+      "category": "Databases",
+      "proficiency": 80,
+      "display_order": 17
+    },
+    {
+      "id": "s18",
+      "name": "MySQL",
+      "category": "Databases",
+      "proficiency": 85,
+      "display_order": 18
+    },
+    {
+      "id": "s19",
+      "name": "SQL Server",
+      "category": "Databases",
+      "proficiency": 80,
+      "display_order": 19
+    },
+    {
+      "id": "s20",
+      "name": "Firebase",
+      "category": "Databases",
+      "proficiency": 80,
+      "display_order": 20
+    },
+    {
+      "id": "s21",
+      "name": "REST APIs",
+      "category": "Other Technologies",
+      "proficiency": 90,
+      "display_order": 21
+    },
+    {
+      "id": "s22",
+      "name": "JWT Authentication",
+      "category": "Other Technologies",
+      "proficiency": 85,
+      "display_order": 22
+    },
+    {
+      "id": "s23",
+      "name": "Git & GitHub",
+      "category": "Other Technologies",
+      "proficiency": 90,
+      "display_order": 23
+    },
+    {
+      "id": "s24",
+      "name": "Data Structures & Algorithms",
+      "category": "Other Technologies",
+      "proficiency": 85,
+      "display_order": 24
+    },
+    {
+      "id": "s25",
+      "name": "Object-Oriented Programming",
+      "category": "Other Technologies",
+      "proficiency": 90,
+      "display_order": 25
+    },
+    {
+      "id": "s27",
+      "name": "Basic Hardware/Software Integration",
+      "category": "Other Technologies",
+      "proficiency": 70,
+      "display_order": 27
+    }
+  ],
+  "experience": [
+    {
+      "id": "e1",
+      "company": "M Tech Production & Marketing",
+      "position": "Full Stack Developer Intern",
+      "start_date": "Jan 2026",
+      "end_date": "Feb 2026",
+      "responsibilities": [
+        "Developed features for the 'Campus Ride Sharing Platform' using React and Node.js.",
+        "Built administrative modules for the 'Campus Utility Management System' using MongoDB.",
+        "Analyzed backend server performance and optimized query logic to reduce response latency.",
+        "Designed structured system architecture plans for multi-role user dashboards.",
+        "Worked in a fast-paced environment completing tasks with a 90% / Grade A final appraisal."
+      ],
+      "technologies": [
+        "React.js",
+        "Node.js",
+        "Express.js",
+        "MongoDB",
+        "SQL Server"
+      ]
+    },
+    {
+      "id": "e2",
+      "company": "M-Tech Production",
+      "position": "App Development Intern",
+      "start_date": "Jul 2025",
+      "end_date": "Aug 2025",
+      "responsibilities": [
+        "Engineered the Flashcard Quiz App with custom timers, scoring models, and flashcard categories.",
+        "Created a user interface and API for the Random Quote Generator based on React and MongoDB.",
+        "Created reusable React components and integrated REST endpoints to retrieve backend data."
+      ],
+      "technologies": [
+        "React.js",
+        "Node.js",
+        "Express.js",
+        "MongoDB",
+        "CSS"
+      ]
+    }
+  ],
+  "education": [
+    {
+      "id": "edu1",
+      "institution": "COMSATS University Islamabad, Abbottabad Campus",
+      "degree": "Bachelor of Science in Computer Science",
+      "field_of_study": "Computer Science",
+      "start_date": "2023",
+      "end_date": "2027",
+      "grade": "Expected Graduation: 2027",
+      "location": "Abbottabad, KPK, Pakistan"
+    },
+    {
+      "id": "edu2",
+      "institution": "Army Public College",
+      "degree": "FSc (Pre-Engineering)",
+      "field_of_study": "Pre-Engineering / High School",
+      "start_date": "2021",
+      "end_date": "2023",
+      "grade": "Matriculation and FSc completed",
+      "location": "Pakistan"
+    }
+  ],
+  "certifications": [],
+  "messages": []
+}
