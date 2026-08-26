@@ -7,6 +7,7 @@ export default defineConfig(({ mode }) => {
   const target = env.VITE_API_BASE_URL || env.VITE_API_URL || 'http://localhost:5000';
 
   return {
+    base: '/',
     plugins: [react()],
     server: {
       port: 3000,
@@ -16,6 +17,10 @@ export default defineConfig(({ mode }) => {
           changeOrigin: true,
         },
       },
+    },
+    build: {
+      outDir: 'dist',
+      sourcemap: false,
     },
   };
 });
