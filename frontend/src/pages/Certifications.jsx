@@ -30,7 +30,7 @@ const Certifications = () => {
                         {certifications.map((cert) => (
                             <div
                                 key={cert.id}
-                                className="card"
+                                className="card cert-card"
                                 style={{
                                     backgroundColor: 'var(--bg-secondary)',
                                     border: '1px solid var(--border-color)',
@@ -40,7 +40,6 @@ const Certifications = () => {
                                     alignItems: 'center',
                                     gap: '20px'
                                 }}
-                                className="cert-card"
                             >
                                 <div style={{ padding: '10px', backgroundColor: 'var(--text-primary)', color: '#fff' }}>
                                     <ShieldCheck size={24} />

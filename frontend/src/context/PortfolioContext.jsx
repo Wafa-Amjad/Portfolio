@@ -15,26 +15,42 @@ export const PortfolioProvider = ({ children }) => {
 
     // Admin Auth State
     const [token, setToken] = useState(localStorage.getItem('token') || null);
-    const [user, setUser] = useState(null);
+    const [user, setUser] = useState(() => {
+        try {
+            const saved = localStorage.getItem('adminUser');
+            return saved ? JSON.parse(saved) : null;
+        } catch {
+            return null;
+        }
+    });
 
     const fetchPublicData = async () => {
         try {
             setLoading(true);
             const [profData, projData, skillsData, expData, eduData, certData] = await Promise.all([
-                apiService.getProfile(),
-                apiService.getProjects(),
-                apiService.getSkills(),
-                apiService.getExperience(),
-                apiService.getEducation(),
-                apiService.getCertifications().catch(() => []) // Fallback in case of errors
+                apiService.getProfile().catch(() => null),
+                apiService.getProjects().catch(() => []),
+                apiService.getSkills().catch(() => []),
+                apiService.getExperience().catch(() => []),
+                apiService.getEducation().catch(() => []),
+                apiService.getCertifications().catch(() => [])
             ]);
 
-            setProfile(profData);
-            setProjects(projData);
-            setSkills(skillsData);
-            setExperience(expData);
-            setEducation(eduData);
-            setCertifications(certData);
+            setProfile(profData || {
+                name: 'Wafa Amjad',
+                title: 'Full-Stack Developer & Software Engineer',
+                location: 'Abbottabad, KPK, Pakistan',
+                email: 'wafaamjad058@gmail.com',
+                bio: 'Building practical web and mobile applications using modern technologies.',
+                long_bio: 'I am Wafa Amjad, a Computer Science undergraduate at COMSATS University Islamabad, Abbottabad Campus. I specialize in designing and engineering practical web and mobile applications from concept to deployment.',
+                github_url: 'https://github.com/Wafa-Amjad',
+                linkedin_url: 'https://linkedin.com/in/wafa-amjad'
+            });
+            setProjects(Array.isArray(projData) ? projData : []);
+            setSkills(Array.isArray(skillsData) ? skillsData : []);
+            setExperience(Array.isArray(expData) ? expData : []);
+            setEducation(Array.isArray(eduData) ? eduData : []);
+            setCertifications(Array.isArray(certData) ? certData : []);
             setError(null);
         } catch (err) {
             console.error('Error fetching public portfolio data:', err);
@@ -46,18 +62,15 @@ export const PortfolioProvider = ({ children }) => {
 
     useEffect(() => {
         fetchPublicData();
-        // Decode user if token is present
-        if (token) {
-            // In a real application, we might decode the JWT, but here we can just set mock user info
-            setUser({ email: localStorage.getItem('adminEmail') || 'wafaamjad058@gmail.com', role: 'admin' });
-        }
-    }, [token]);
+    }, []);
 
     const loginAdmin = async (email, password) => {
         try {
             const data = await apiService.login(email, password);
             localStorage.setItem('token', data.token);
-            localStorage.setItem('adminEmail', data.user.email);
+            if (data.user) {
+                localStorage.setItem('adminUser', JSON.stringify(data.user));
+            }
             setToken(data.token);
             setUser(data.user);
             return data;
@@ -68,7 +81,7 @@ export const PortfolioProvider = ({ children }) => {
 
     const logoutAdmin = () => {
         localStorage.removeItem('token');
-        localStorage.removeItem('adminEmail');
+        localStorage.removeItem('adminUser');
         setToken(null);
         setUser(null);
     };

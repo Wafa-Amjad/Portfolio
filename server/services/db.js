@@ -2,6 +2,7 @@ import fs from 'fs/promises';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import supabase from '../config/supabase.js';
+import { sanitizeString, sanitizeUrl } from '../middleware/security.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -16,9 +17,20 @@ async function readLocalDb() {
         const data = await fs.readFile(dbFilePath, 'utf-8');
         return JSON.parse(data);
     } catch (error) {
-        console.error('Error reading local DB file, returning empty structure:', error);
+        console.error('Error reading local DB file, returning fallback structure:', error.message);
         return {
-            profile: {},
+            profile: {
+                name: 'Wafa Amjad',
+                title: 'Full-Stack Developer & Software Engineer',
+                location: 'Abbottabad, KPK, Pakistan',
+                email: 'wafaamjad058@gmail.com',
+                bio: 'Building practical web and mobile applications using modern technologies.',
+                long_bio: 'I am Wafa Amjad, a Computer Science undergraduate at COMSATS University Islamabad, Abbottabad Campus. I specialize in designing and engineering practical web and mobile applications from concept to deployment.',
+                github_url: 'https://github.com/Wafa-Amjad',
+                linkedin_url: 'https://linkedin.com/in/wafa-amjad',
+                resume_url: '',
+                profile_image: ''
+            },
             projects: [],
             skills: [],
             experience: [],
@@ -34,7 +46,7 @@ async function writeLocalDb(data) {
         await fs.writeFile(dbFilePath, JSON.stringify(data, null, 2), 'utf-8');
         return true;
     } catch (error) {
-        console.error('Error writing local DB file:', error);
+        console.error('Error writing local DB file:', error.message);
         return false;
     }
 }
@@ -49,30 +61,54 @@ export const dbService = {
         if (isSupabaseActive()) {
             const { data, error } = await supabase.from('profiles').select('*').limit(1).maybeSingle();
             if (!error && data) return data;
-            // Fallback if profiles table is empty or error
-            if (error) console.error('Supabase Profiles Error:', error);
+            if (error) console.error('[Supabase] getProfile error:', error.message);
         }
         const db = await readLocalDb();
         return db.profile;
     },
 
-    updateProfile: async (profileData) => {
+    updateProfile: async (profileData, userId = null) => {
+        const cleanData = {
+            name: sanitizeString(profileData.name, 100) || 'Wafa Amjad',
+            title: sanitizeString(profileData.title, 150) || 'Full-Stack Developer',
+            location: sanitizeString(profileData.location, 150),
+            email: sanitizeString(profileData.email, 100),
+            bio: sanitizeString(profileData.bio, 500),
+            long_bio: sanitizeString(profileData.long_bio, 5000),
+            github_url: sanitizeUrl(profileData.github_url),
+            linkedin_url: sanitizeUrl(profileData.linkedin_url),
+            resume_url: sanitizeUrl(profileData.resume_url),
+            profile_image: sanitizeUrl(profileData.profile_image),
+            updated_at: new Date().toISOString()
+        };
+
         if (isSupabaseActive()) {
-            // Assuming single profile entry. We query first or upsert.
-            const { data: firstProfile } = await supabase.from('profiles').select('id').limit(1).maybeSingle();
-            let query;
-            if (firstProfile) {
-                query = supabase.from('profiles').update(profileData).eq('id', firstProfile.id).select().single();
+            // Find if a profile already exists
+            const { data: existingProfile } = await supabase.from('profiles').select('id').limit(1).maybeSingle();
+
+            let targetId = existingProfile?.id || userId;
+
+            if (targetId) {
+                const { data, error } = await supabase
+                    .from('profiles')
+                    .upsert([{ id: targetId, ...cleanData }])
+                    .select()
+                    .single();
+
+                if (!error) return data;
+                console.error('[Supabase] updateProfile upsert error:', error.message);
+                throw new Error('Database error updating profile: ' + error.message);
             } else {
-                query = supabase.from('profiles').insert([profileData]).select().single();
+                // If no target ID exists yet, insert
+                const { data, error } = await supabase.from('profiles').insert([cleanData]).select().single();
+                if (!error) return data;
+                console.error('[Supabase] updateProfile insert error:', error.message);
+                throw new Error('Database error inserting profile: ' + error.message);
             }
-            const { data, error } = await query;
-            if (!error) return data;
-            console.error('Supabase updateProfile error:', error);
-            throw error;
         }
+
         const db = await readLocalDb();
-        db.profile = { ...db.profile, ...profileData };
+        db.profile = { ...db.profile, ...cleanData };
         await writeLocalDb(db);
         return db.profile;
     },
@@ -86,14 +122,13 @@ export const dbService = {
                 .order('featured', { ascending: false })
                 .order('project_date', { ascending: false });
             if (!error) return data;
-            console.error('Supabase getProjects error:', error);
+            console.error('[Supabase] getProjects error:', error.message);
         }
         const db = await readLocalDb();
-        // Sort logic local: Featured first, then by date descending
-        return [...db.projects].sort((a, b) => {
+        return [...(db.projects || [])].sort((a, b) => {
             if (a.featured && !b.featured) return -1;
             if (!a.featured && b.featured) return 1;
-            return new Date(b.project_date) - new Date(a.project_date);
+            return new Date(b.project_date || 0) - new Date(a.project_date || 0);
         });
     },
 
@@ -101,24 +136,46 @@ export const dbService = {
         if (isSupabaseActive()) {
             const { data, error } = await supabase.from('projects').select('*').eq('id', id).maybeSingle();
             if (!error && data) return data;
-            console.error('Supabase getProjectById error:', error);
+            if (error) console.error('[Supabase] getProjectById error:', error.message);
         }
         const db = await readLocalDb();
-        return db.projects.find(p => p.id === id) || null;
+        return (db.projects || []).find(p => p.id === id) || null;
     },
 
     createProject: async (projectData) => {
+        const cleanProject = {
+            title: sanitizeString(projectData.title, 200),
+            short_description: sanitizeString(projectData.short_description, 500),
+            detailed_description: sanitizeString(projectData.detailed_description, 5000),
+            category: sanitizeString(projectData.category, 100),
+            technologies: Array.isArray(projectData.technologies) 
+                ? projectData.technologies.map(t => sanitizeString(t, 50)).filter(Boolean)
+                : [],
+            image_url: sanitizeUrl(projectData.image_url),
+            github_url: sanitizeUrl(projectData.github_url),
+            live_url: sanitizeUrl(projectData.live_url),
+            featured: Boolean(projectData.featured),
+            project_date: projectData.project_date ? String(projectData.project_date).slice(0, 10) : null,
+            highlights: Array.isArray(projectData.highlights) 
+                ? projectData.highlights.map(h => sanitizeString(h, 200)).filter(Boolean)
+                : [],
+            role: sanitizeString(projectData.role, 100),
+            database_tech: sanitizeString(projectData.database_tech, 100),
+            project_type: sanitizeString(projectData.project_type, 100)
+        };
+
         if (isSupabaseActive()) {
-            const { data, error } = await supabase.from('projects').insert([projectData]).select().single();
+            const { data, error } = await supabase.from('projects').insert([cleanProject]).select().single();
             if (!error) return data;
-            console.error('Supabase createProject error:', error);
-            throw error;
+            console.error('[Supabase] createProject error:', error.message);
+            throw new Error(error.message);
         }
+
         const db = await readLocalDb();
+        if (!db.projects) db.projects = [];
         const newProject = {
-            ...projectData,
-            id: 'p_' + Date.now().toString(36),
-            featured: projectData.featured === true || projectData.featured === 'true'
+            ...cleanProject,
+            id: 'p_' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6)
         };
         db.projects.push(newProject);
         await writeLocalDb(db);
@@ -126,20 +183,41 @@ export const dbService = {
     },
 
     updateProject: async (id, projectData) => {
+        const cleanProject = {
+            title: sanitizeString(projectData.title, 200),
+            short_description: sanitizeString(projectData.short_description, 500),
+            detailed_description: sanitizeString(projectData.detailed_description, 5000),
+            category: sanitizeString(projectData.category, 100),
+            technologies: Array.isArray(projectData.technologies) 
+                ? projectData.technologies.map(t => sanitizeString(t, 50)).filter(Boolean)
+                : [],
+            image_url: sanitizeUrl(projectData.image_url),
+            github_url: sanitizeUrl(projectData.github_url),
+            live_url: sanitizeUrl(projectData.live_url),
+            featured: Boolean(projectData.featured),
+            project_date: projectData.project_date ? String(projectData.project_date).slice(0, 10) : null,
+            highlights: Array.isArray(projectData.highlights) 
+                ? projectData.highlights.map(h => sanitizeString(h, 200)).filter(Boolean)
+                : [],
+            role: sanitizeString(projectData.role, 100),
+            database_tech: sanitizeString(projectData.database_tech, 100),
+            project_type: sanitizeString(projectData.project_type, 100)
+        };
+
         if (isSupabaseActive()) {
-            const { data, error } = await supabase.from('projects').update(projectData).eq('id', id).select().single();
+            const { data, error } = await supabase.from('projects').update(cleanProject).eq('id', id).select().single();
             if (!error) return data;
-            console.error('Supabase updateProject error:', error);
-            throw error;
+            console.error('[Supabase] updateProject error:', error.message);
+            throw new Error(error.message);
         }
+
         const db = await readLocalDb();
-        const index = db.projects.findIndex(p => p.id === id);
+        const index = (db.projects || []).findIndex(p => p.id === id);
         if (index === -1) throw new Error('Project not found');
         db.projects[index] = {
             ...db.projects[index],
-            ...projectData,
-            id, // keep original ID
-            featured: projectData.featured === true || projectData.featured === 'true'
+            ...cleanProject,
+            id
         };
         await writeLocalDb(db);
         return db.projects[index];
@@ -149,11 +227,12 @@ export const dbService = {
         if (isSupabaseActive()) {
             const { error } = await supabase.from('projects').delete().eq('id', id);
             if (!error) return true;
-            console.error('Supabase deleteProject error:', error);
-            throw error;
+            console.error('[Supabase] deleteProject error:', error.message);
+            throw new Error(error.message);
         }
+
         const db = await readLocalDb();
-        const index = db.projects.findIndex(p => p.id === id);
+        const index = (db.projects || []).findIndex(p => p.id === id);
         if (index === -1) throw new Error('Project not found');
         db.projects.splice(index, 1);
         await writeLocalDb(db);
@@ -165,25 +244,33 @@ export const dbService = {
         if (isSupabaseActive()) {
             const { data, error } = await supabase.from('skills').select('*').order('display_order', { ascending: true });
             if (!error) return data;
-            console.error('Supabase getSkills error:', error);
+            console.error('[Supabase] getSkills error:', error.message);
         }
         const db = await readLocalDb();
-        return [...db.skills].sort((a, b) => a.display_order - b.display_order);
+        return [...(db.skills || [])].sort((a, b) => a.display_order - b.display_order);
     },
 
     createSkill: async (skillData) => {
+        const cleanSkill = {
+            name: sanitizeString(skillData.name, 100),
+            category: sanitizeString(skillData.category, 100),
+            proficiency: Math.min(100, Math.max(0, parseInt(skillData.proficiency, 10) || 80)),
+            display_order: parseInt(skillData.display_order, 10) || 0
+        };
+
         if (isSupabaseActive()) {
-            const { data, error } = await supabase.from('skills').insert([skillData]).select().single();
+            const { data, error } = await supabase.from('skills').insert([cleanSkill]).select().single();
             if (!error) return data;
-            console.error('Supabase createSkill error:', error);
-            throw error;
+            console.error('[Supabase] createSkill error:', error.message);
+            throw new Error(error.message);
         }
+
         const db = await readLocalDb();
+        if (!db.skills) db.skills = [];
         const newSkill = {
-            ...skillData,
-            id: 's_' + Date.now().toString(36),
-            proficiency: parseInt(skillData.proficiency) || 80,
-            display_order: parseInt(skillData.display_order) || db.skills.length + 1
+            ...cleanSkill,
+            id: 's_' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
+            display_order: cleanSkill.display_order || db.skills.length + 1
         };
         db.skills.push(newSkill);
         await writeLocalDb(db);
@@ -191,21 +278,27 @@ export const dbService = {
     },
 
     updateSkill: async (id, skillData) => {
+        const cleanSkill = {
+            name: sanitizeString(skillData.name, 100),
+            category: sanitizeString(skillData.category, 100),
+            proficiency: Math.min(100, Math.max(0, parseInt(skillData.proficiency, 10) || 80)),
+            display_order: parseInt(skillData.display_order, 10) || 0
+        };
+
         if (isSupabaseActive()) {
-            const { data, error } = await supabase.from('skills').update(skillData).eq('id', id).select().single();
+            const { data, error } = await supabase.from('skills').update(cleanSkill).eq('id', id).select().single();
             if (!error) return data;
-            console.error('Supabase updateSkill error:', error);
-            throw error;
+            console.error('[Supabase] updateSkill error:', error.message);
+            throw new Error(error.message);
         }
+
         const db = await readLocalDb();
-        const index = db.skills.findIndex(s => s.id === id);
+        const index = (db.skills || []).findIndex(s => s.id === id);
         if (index === -1) throw new Error('Skill not found');
         db.skills[index] = {
             ...db.skills[index],
-            ...skillData,
-            id,
-            proficiency: parseInt(skillData.proficiency) || db.skills[index].proficiency,
-            display_order: parseInt(skillData.display_order) || db.skills[index].display_order
+            ...cleanSkill,
+            id
         };
         await writeLocalDb(db);
         return db.skills[index];
@@ -215,11 +308,12 @@ export const dbService = {
         if (isSupabaseActive()) {
             const { error } = await supabase.from('skills').delete().eq('id', id);
             if (!error) return true;
-            console.error('Supabase deleteSkill error:', error);
-            throw error;
+            console.error('[Supabase] deleteSkill error:', error.message);
+            throw new Error(error.message);
         }
+
         const db = await readLocalDb();
-        const index = db.skills.findIndex(s => s.id === id);
+        const index = (db.skills || []).findIndex(s => s.id === id);
         if (index === -1) throw new Error('Skill not found');
         db.skills.splice(index, 1);
         await writeLocalDb(db);
@@ -231,26 +325,42 @@ export const dbService = {
         if (isSupabaseActive()) {
             const { data, error } = await supabase.from('experience').select('*').order('created_at', { ascending: false });
             if (!error) return data;
-            console.error('Supabase getExperience error:', error);
+            console.error('[Supabase] getExperience error:', error.message);
         }
         const db = await readLocalDb();
-        // Returning in raw array order or sorted by date if parseable
-        return db.experience;
+        return db.experience || [];
     },
 
     createExperience: async (expData) => {
+        const cleanExp = {
+            company: sanitizeString(expData.company, 150),
+            position: sanitizeString(expData.position, 150),
+            start_date: sanitizeString(expData.start_date, 50),
+            end_date: sanitizeString(expData.end_date, 50),
+            responsibilities: Array.isArray(expData.responsibilities)
+                ? expData.responsibilities.map(r => sanitizeString(r, 500)).filter(Boolean)
+                : typeof expData.responsibilities === 'string' && expData.responsibilities.trim()
+                    ? [sanitizeString(expData.responsibilities, 500)]
+                    : [],
+            technologies: Array.isArray(expData.technologies)
+                ? expData.technologies.map(t => sanitizeString(t, 50)).filter(Boolean)
+                : typeof expData.technologies === 'string' && expData.technologies.trim()
+                    ? [sanitizeString(expData.technologies, 50)]
+                    : []
+        };
+
         if (isSupabaseActive()) {
-            const { data, error } = await supabase.from('experience').insert([expData]).select().single();
+            const { data, error } = await supabase.from('experience').insert([cleanExp]).select().single();
             if (!error) return data;
-            console.error('Supabase createExperience error:', error);
-            throw error;
+            console.error('[Supabase] createExperience error:', error.message);
+            throw new Error(error.message);
         }
+
         const db = await readLocalDb();
+        if (!db.experience) db.experience = [];
         const newExp = {
-            ...expData,
-            id: 'e_' + Date.now().toString(36),
-            responsibilities: Array.isArray(expData.responsibilities) ? expData.responsibilities : [expData.responsibilities],
-            technologies: Array.isArray(expData.technologies) ? expData.technologies : [expData.technologies]
+            ...cleanExp,
+            id: 'e_' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6)
         };
         db.experience.push(newExp);
         await writeLocalDb(db);
@@ -258,21 +368,37 @@ export const dbService = {
     },
 
     updateExperience: async (id, expData) => {
+        const cleanExp = {
+            company: sanitizeString(expData.company, 150),
+            position: sanitizeString(expData.position, 150),
+            start_date: sanitizeString(expData.start_date, 50),
+            end_date: sanitizeString(expData.end_date, 50),
+            responsibilities: Array.isArray(expData.responsibilities)
+                ? expData.responsibilities.map(r => sanitizeString(r, 500)).filter(Boolean)
+                : typeof expData.responsibilities === 'string' && expData.responsibilities.trim()
+                    ? [sanitizeString(expData.responsibilities, 500)]
+                    : [],
+            technologies: Array.isArray(expData.technologies)
+                ? expData.technologies.map(t => sanitizeString(t, 50)).filter(Boolean)
+                : typeof expData.technologies === 'string' && expData.technologies.trim()
+                    ? [sanitizeString(expData.technologies, 50)]
+                    : []
+        };
+
         if (isSupabaseActive()) {
-            const { data, error } = await supabase.from('experience').update(expData).eq('id', id).select().single();
+            const { data, error } = await supabase.from('experience').update(cleanExp).eq('id', id).select().single();
             if (!error) return data;
-            console.error('Supabase updateExperience error:', error);
-            throw error;
+            console.error('[Supabase] updateExperience error:', error.message);
+            throw new Error(error.message);
         }
+
         const db = await readLocalDb();
-        const index = db.experience.findIndex(e => e.id === id);
+        const index = (db.experience || []).findIndex(e => e.id === id);
         if (index === -1) throw new Error('Experience not found');
         db.experience[index] = {
             ...db.experience[index],
-            ...expData,
-            id,
-            responsibilities: Array.isArray(expData.responsibilities) ? expData.responsibilities : [expData.responsibilities],
-            technologies: Array.isArray(expData.technologies) ? expData.technologies : [expData.technologies]
+            ...cleanExp,
+            id
         };
         await writeLocalDb(db);
         return db.experience[index];
@@ -282,11 +408,12 @@ export const dbService = {
         if (isSupabaseActive()) {
             const { error } = await supabase.from('experience').delete().eq('id', id);
             if (!error) return true;
-            console.error('Supabase deleteExperience error:', error);
-            throw error;
+            console.error('[Supabase] deleteExperience error:', error.message);
+            throw new Error(error.message);
         }
+
         const db = await readLocalDb();
-        const index = db.experience.findIndex(e => e.id === id);
+        const index = (db.experience || []).findIndex(e => e.id === id);
         if (index === -1) throw new Error('Experience not found');
         db.experience.splice(index, 1);
         await writeLocalDb(db);
@@ -298,23 +425,35 @@ export const dbService = {
         if (isSupabaseActive()) {
             const { data, error } = await supabase.from('education').select('*').order('created_at', { ascending: false });
             if (!error) return data;
-            console.error('Supabase getEducation error:', error);
+            console.error('[Supabase] getEducation error:', error.message);
         }
         const db = await readLocalDb();
-        return db.education;
+        return db.education || [];
     },
 
     createEducation: async (eduData) => {
+        const cleanEdu = {
+            institution: sanitizeString(eduData.institution, 150),
+            degree: sanitizeString(eduData.degree, 150),
+            field_of_study: sanitizeString(eduData.field_of_study, 150),
+            start_date: sanitizeString(eduData.start_date, 50),
+            end_date: sanitizeString(eduData.end_date, 50),
+            grade: sanitizeString(eduData.grade, 50),
+            location: sanitizeString(eduData.location, 150)
+        };
+
         if (isSupabaseActive()) {
-            const { data, error } = await supabase.from('education').insert([eduData]).select().single();
+            const { data, error } = await supabase.from('education').insert([cleanEdu]).select().single();
             if (!error) return data;
-            console.error('Supabase createEducation error:', error);
-            throw error;
+            console.error('[Supabase] createEducation error:', error.message);
+            throw new Error(error.message);
         }
+
         const db = await readLocalDb();
+        if (!db.education) db.education = [];
         const newEdu = {
-            ...eduData,
-            id: 'edu_' + Date.now().toString(36)
+            ...cleanEdu,
+            id: 'edu_' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6)
         };
         db.education.push(newEdu);
         await writeLocalDb(db);
@@ -322,18 +461,29 @@ export const dbService = {
     },
 
     updateEducation: async (id, eduData) => {
+        const cleanEdu = {
+            institution: sanitizeString(eduData.institution, 150),
+            degree: sanitizeString(eduData.degree, 150),
+            field_of_study: sanitizeString(eduData.field_of_study, 150),
+            start_date: sanitizeString(eduData.start_date, 50),
+            end_date: sanitizeString(eduData.end_date, 50),
+            grade: sanitizeString(eduData.grade, 50),
+            location: sanitizeString(eduData.location, 150)
+        };
+
         if (isSupabaseActive()) {
-            const { data, error } = await supabase.from('education').update(eduData).eq('id', id).select().single();
+            const { data, error } = await supabase.from('education').update(cleanEdu).eq('id', id).select().single();
             if (!error) return data;
-            console.error('Supabase updateEducation error:', error);
-            throw error;
+            console.error('[Supabase] updateEducation error:', error.message);
+            throw new Error(error.message);
         }
+
         const db = await readLocalDb();
-        const index = db.education.findIndex(edu => edu.id === id);
+        const index = (db.education || []).findIndex(edu => edu.id === id);
         if (index === -1) throw new Error('Education not found');
         db.education[index] = {
             ...db.education[index],
-            ...eduData,
+            ...cleanEdu,
             id
         };
         await writeLocalDb(db);
@@ -344,11 +494,12 @@ export const dbService = {
         if (isSupabaseActive()) {
             const { error } = await supabase.from('education').delete().eq('id', id);
             if (!error) return true;
-            console.error('Supabase deleteEducation error:', error);
-            throw error;
+            console.error('[Supabase] deleteEducation error:', error.message);
+            throw new Error(error.message);
         }
+
         const db = await readLocalDb();
-        const index = db.education.findIndex(edu => edu.id === id);
+        const index = (db.education || []).findIndex(edu => edu.id === id);
         if (index === -1) throw new Error('Education not found');
         db.education.splice(index, 1);
         await writeLocalDb(db);
@@ -360,24 +511,34 @@ export const dbService = {
         if (isSupabaseActive()) {
             const { data, error } = await supabase.from('certifications').select('*').order('created_at', { ascending: false });
             if (!error) return data;
-            console.error('Supabase getCertifications error:', error);
+            console.error('[Supabase] getCertifications error:', error.message);
         }
         const db = await readLocalDb();
         return db.certifications || [];
     },
 
     createCertification: async (certData) => {
+        const cleanCert = {
+            name: sanitizeString(certData.name, 150),
+            issuing_organization: sanitizeString(certData.issuing_organization, 150),
+            issue_date: sanitizeString(certData.issue_date, 50),
+            credential_id: sanitizeString(certData.credential_id, 100),
+            credential_url: sanitizeUrl(certData.credential_url),
+            image_url: sanitizeUrl(certData.image_url)
+        };
+
         if (isSupabaseActive()) {
-            const { data, error } = await supabase.from('certifications').insert([certData]).select().single();
+            const { data, error } = await supabase.from('certifications').insert([cleanCert]).select().single();
             if (!error) return data;
-            console.error('Supabase createCertification error:', error);
-            throw error;
+            console.error('[Supabase] createCertification error:', error.message);
+            throw new Error(error.message);
         }
+
         const db = await readLocalDb();
         if (!db.certifications) db.certifications = [];
         const newCert = {
-            ...certData,
-            id: 'cert_' + Date.now().toString(36)
+            ...cleanCert,
+            id: 'cert_' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6)
         };
         db.certifications.push(newCert);
         await writeLocalDb(db);
@@ -385,19 +546,29 @@ export const dbService = {
     },
 
     updateCertification: async (id, certData) => {
+        const cleanCert = {
+            name: sanitizeString(certData.name, 150),
+            issuing_organization: sanitizeString(certData.issuing_organization, 150),
+            issue_date: sanitizeString(certData.issue_date, 50),
+            credential_id: sanitizeString(certData.credential_id, 100),
+            credential_url: sanitizeUrl(certData.credential_url),
+            image_url: sanitizeUrl(certData.image_url)
+        };
+
         if (isSupabaseActive()) {
-            const { data, error } = await supabase.from('certifications').update(certData).eq('id', id).select().single();
+            const { data, error } = await supabase.from('certifications').update(cleanCert).eq('id', id).select().single();
             if (!error) return data;
-            console.error('Supabase updateCertification error:', error);
-            throw error;
+            console.error('[Supabase] updateCertification error:', error.message);
+            throw new Error(error.message);
         }
+
         const db = await readLocalDb();
         if (!db.certifications) db.certifications = [];
         const index = db.certifications.findIndex(c => c.id === id);
         if (index === -1) throw new Error('Certification not found');
         db.certifications[index] = {
             ...db.certifications[index],
-            ...certData,
+            ...cleanCert,
             id
         };
         await writeLocalDb(db);
@@ -408,9 +579,10 @@ export const dbService = {
         if (isSupabaseActive()) {
             const { error } = await supabase.from('certifications').delete().eq('id', id);
             if (!error) return true;
-            console.error('Supabase deleteCertification error:', error);
-            throw error;
+            console.error('[Supabase] deleteCertification error:', error.message);
+            throw new Error(error.message);
         }
+
         const db = await readLocalDb();
         if (!db.certifications) db.certifications = [];
         const index = db.certifications.findIndex(c => c.id === id);
@@ -425,29 +597,34 @@ export const dbService = {
         if (isSupabaseActive()) {
             const { data, error } = await supabase.from('messages').select('*').order('created_at', { ascending: false });
             if (!error) return data;
-            console.error('Supabase getMessages error:', error);
+            console.error('[Supabase] getMessages error:', error.message);
         }
         const db = await readLocalDb();
-        return [...db.messages].sort((a, b) => new Date(b.created_at || 0) - new Date(a.created_at || 0));
+        return [...(db.messages || [])].sort((a, b) => new Date(b.created_at || 0) - new Date(a.created_at || 0));
     },
 
     createMessage: async (messageData) => {
         const enrichedMessage = {
-            ...messageData,
+            name: sanitizeString(messageData.name, 100),
+            email: sanitizeString(messageData.email, 100),
+            subject: sanitizeString(messageData.subject, 200),
+            message: sanitizeString(messageData.message, 5000),
             read: false,
             created_at: new Date().toISOString()
         };
+
         if (isSupabaseActive()) {
-            // In Supabase, ID might be auto-uuid
             const { data, error } = await supabase.from('messages').insert([enrichedMessage]).select().single();
             if (!error) return data;
-            console.error('Supabase createMessage error:', error);
-            throw error;
+            console.error('[Supabase] createMessage error:', error.message);
+            throw new Error(error.message);
         }
+
         const db = await readLocalDb();
+        if (!db.messages) db.messages = [];
         const newMsg = {
             ...enrichedMessage,
-            id: 'm_' + Date.now().toString(36)
+            id: 'm_' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6)
         };
         db.messages.push(newMsg);
         await writeLocalDb(db);
@@ -456,15 +633,16 @@ export const dbService = {
 
     markMessageRead: async (id, isRead = true) => {
         if (isSupabaseActive()) {
-            const { data, error } = await supabase.from('messages').update({ read: isRead }).eq('id', id).select().single();
+            const { data, error } = await supabase.from('messages').update({ read: Boolean(isRead) }).eq('id', id).select().single();
             if (!error) return data;
-            console.error('Supabase markMessageRead error:', error);
-            throw error;
+            console.error('[Supabase] markMessageRead error:', error.message);
+            throw new Error(error.message);
         }
+
         const db = await readLocalDb();
-        const index = db.messages.findIndex(m => m.id === id);
+        const index = (db.messages || []).findIndex(m => m.id === id);
         if (index === -1) throw new Error('Message not found');
-        db.messages[index].read = isRead;
+        db.messages[index].read = Boolean(isRead);
         await writeLocalDb(db);
         return db.messages[index];
     },
@@ -473,11 +651,12 @@ export const dbService = {
         if (isSupabaseActive()) {
             const { error } = await supabase.from('messages').delete().eq('id', id);
             if (!error) return true;
-            console.error('Supabase deleteMessage error:', error);
-            throw error;
+            console.error('[Supabase] deleteMessage error:', error.message);
+            throw new Error(error.message);
         }
+
         const db = await readLocalDb();
-        const index = db.messages.findIndex(m => m.id === id);
+        const index = (db.messages || []).findIndex(m => m.id === id);
         if (index === -1) throw new Error('Message not found');
         db.messages.splice(index, 1);
         await writeLocalDb(db);

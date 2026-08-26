@@ -1,5 +1,6 @@
 import express from 'express';
 import { requireAuth } from '../middleware/auth.js';
+import { authLimiter, messageLimiter } from '../middleware/security.js';
 import {
     getProfile,
     updateProfile
@@ -45,8 +46,8 @@ import { login } from '../controllers/authController.js';
 
 const router = express.Router();
 
-// -- AUTHENTICATION RENDER --
-router.post('/auth/login', login);
+// -- AUTHENTICATION --
+router.post('/auth/login', authLimiter, login);
 
 // -- PROFILE API --
 router.get('/profile', getProfile);
@@ -84,7 +85,7 @@ router.put('/certifications/:id', requireAuth, updateCertification);
 router.delete('/certifications/:id', requireAuth, deleteCertification);
 
 // -- MESSAGES API --
-router.post('/messages', createMessage);
+router.post('/messages', messageLimiter, createMessage);
 router.get('/messages', requireAuth, getMessages);
 router.put('/messages/:id/read', requireAuth, markMessageRead);
 router.delete('/messages/:id', requireAuth, deleteMessage);

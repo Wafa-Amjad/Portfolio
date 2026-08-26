@@ -3,33 +3,36 @@ import supabase from '../config/supabase.js';
 export const requireAuth = async (req, res, next) => {
     const authHeader = req.headers.authorization;
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
-        return res.status(401).json({ error: 'Authorization header missing or invalid' });
+        return res.status(401).json({ error: 'Authorization header missing or malformed' });
     }
 
     const token = authHeader.split(' ')[1];
+    if (!token || token.trim() === '') {
+        return res.status(401).json({ error: 'Authentication token required' });
+    }
+
+    if (!supabase) {
+        return res.status(500).json({ error: 'Supabase authentication service is not configured' });
+    }
 
     try {
-        if (supabase) {
-            // Validate token with Supabase Auth
-            const { data: { user }, error } = await supabase.auth.getUser(token);
+        // Validate JWT token strictly with Supabase Auth
+        const { data: { user }, error } = await supabase.auth.getUser(token);
 
-            if (error || !user) {
-                return res.status(401).json({ error: 'Unauthorized: Invalid Supabase session' });
-            }
-
-            // Store user object in request for routing
-            req.user = user;
-            next();
-        } else {
-            // Local fallback mode
-            if (token === 'mock-admin-token') {
-                req.user = { email: process.env.ADMIN_EMAIL || 'wafaamjad058@gmail.com', role: 'admin' };
-                return next();
-            }
-            return res.status(401).json({ error: 'Unauthorized: Invalid local token' });
+        if (error || !user) {
+            return res.status(401).json({ error: 'Unauthorized: Invalid or expired Supabase session' });
         }
+
+        // Attach validated user to request object
+        req.user = {
+            id: user.id,
+            email: user.email,
+            role: 'admin',
+            metadata: user.user_metadata || {}
+        };
+        return next();
     } catch (error) {
-        console.error('Authentication middleware error:', error);
-        return res.status(500).json({ error: 'Internal server error during authentication' });
+        console.error('[Auth Middleware] Authentication error:', error.message);
+        return res.status(500).json({ error: 'Internal server error during session authentication' });
     }
 };

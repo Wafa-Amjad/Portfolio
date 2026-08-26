@@ -5,6 +5,7 @@ export const getExperience = async (req, res) => {
         const experience = await dbService.getExperience();
         res.json(experience);
     } catch (error) {
+        console.error('[Experience Controller] getExperience error:', error.message);
         res.status(500).json({ error: 'Failed to retrieve experience' });
     }
 };
@@ -19,6 +20,7 @@ export const createExperience = async (req, res) => {
         const newExp = await dbService.createExperience(req.body);
         res.status(201).json(newExp);
     } catch (error) {
+        console.error('[Experience Controller] createExperience error:', error.message);
         res.status(500).json({ error: 'Failed to create experience' });
     }
 };
@@ -36,6 +38,7 @@ export const updateExperience = async (req, res) => {
         if (error.message === 'Experience not found') {
             return res.status(404).json({ error: error.message });
         }
+        console.error('[Experience Controller] updateExperience error:', error.message);
         res.status(500).json({ error: 'Failed to update experience' });
     }
 };
@@ -48,6 +51,7 @@ export const deleteExperience = async (req, res) => {
         if (error.message === 'Experience not found') {
             return res.status(404).json({ error: error.message });
         }
+        console.error('[Experience Controller] deleteExperience error:', error.message);
         res.status(500).json({ error: 'Failed to delete experience' });
     }
 };

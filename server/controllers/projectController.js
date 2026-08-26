@@ -5,6 +5,7 @@ export const getProjects = async (req, res) => {
         const projects = await dbService.getProjects();
         res.json(projects);
     } catch (error) {
+        console.error('[Project Controller] getProjects error:', error.message);
         res.status(500).json({ error: 'Failed to retrieve projects' });
     }
 };
@@ -17,6 +18,7 @@ export const getProjectById = async (req, res) => {
         }
         res.json(project);
     } catch (error) {
+        console.error('[Project Controller] getProjectById error:', error.message);
         res.status(500).json({ error: 'Failed to retrieve project' });
     }
 };
@@ -31,7 +33,8 @@ export const createProject = async (req, res) => {
         const newProject = await dbService.createProject(req.body);
         res.status(201).json(newProject);
     } catch (error) {
-        res.status(500).json({ error: 'Failed to create project' });
+        console.error('[Project Controller] createProject error:', error.message);
+        res.status(500).json({ error: 'Failed to create project: ' + error.message });
     }
 };
 
@@ -48,7 +51,8 @@ export const updateProject = async (req, res) => {
         if (error.message === 'Project not found') {
             return res.status(404).json({ error: error.message });
         }
-        res.status(500).json({ error: 'Failed to update project' });
+        console.error('[Project Controller] updateProject error:', error.message);
+        res.status(500).json({ error: 'Failed to update project: ' + error.message });
     }
 };
 
@@ -60,6 +64,7 @@ export const deleteProject = async (req, res) => {
         if (error.message === 'Project not found') {
             return res.status(404).json({ error: error.message });
         }
+        console.error('[Project Controller] deleteProject error:', error.message);
         res.status(500).json({ error: 'Failed to delete project' });
     }
 };

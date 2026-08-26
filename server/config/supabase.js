@@ -10,12 +10,19 @@ const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 let supabase = null;
 
 if (supabaseUrl && (supabaseAnonKey || supabaseServiceKey)) {
-    // Use service key if available for system calculations, otherwise anon
-    supabase = createClient(supabaseUrl, supabaseServiceKey || supabaseAnonKey);
-    console.log('Supabase client initialized successfully.');
+    // Prefer service role key on backend for admin database operations, fallback to anon
+    const key = supabaseServiceKey || supabaseAnonKey;
+    supabase = createClient(supabaseUrl, key, {
+        auth: {
+            persistSession: false,
+            autoRefreshToken: false,
+            detectSessionInUrl: false
+        }
+    });
+    console.log(`[Supabase] Client initialized successfully (${supabaseServiceKey ? 'Service-Role' : 'Anon'} mode).`);
 } else {
-    console.warn('Supabase URL or Key not found in environment variables. Falling back to local JSON database mode.');
+    console.warn('[Supabase] SUPABASE_URL or keys not configured. Operating in local JSON storage mode.');
 }
 
 export default supabase;
-export { supabaseUrl, supabaseAnonKey };
+export { supabaseUrl, supabaseAnonKey, supabaseServiceKey };

@@ -28,7 +28,7 @@ const Education = () => {
                         {education.map((edu) => (
                             <div
                                 key={edu.id}
-                                className="card"
+                                className="card education-entry"
                                 style={{
                                     backgroundColor: 'var(--bg-secondary)',
                                     border: '1px solid var(--border-color)',
@@ -38,7 +38,6 @@ const Education = () => {
                                     gap: '24px',
                                     alignItems: 'flex-start'
                                 }}
-                                className="education-entry"
                             >
                                 <div style={{ padding: '12px', backgroundColor: 'var(--text-primary)', color: 'var(--bg-primary)' }}>
                                     <GraduationCap size={24} />

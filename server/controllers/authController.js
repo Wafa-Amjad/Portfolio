@@ -3,50 +3,37 @@ import supabase from '../config/supabase.js';
 export const login = async (req, res) => {
     const { email, password } = req.body;
 
-    if (!email || !password) {
+    if (!email || !password || typeof email !== 'string' || typeof password !== 'string') {
         return res.status(400).json({ error: 'Email and password are required' });
     }
 
+    if (!supabase) {
+        return res.status(500).json({ error: 'Supabase authentication service is not configured' });
+    }
+
+    const trimmedEmail = email.trim().toLowerCase();
+
     try {
-        if (supabase) {
-            // Supabase Authentication
-            const { data, error } = await supabase.auth.signInWithPassword({
-                email,
-                password
-            });
+        // Authenticate directly and exclusively with Supabase Auth
+        const { data, error } = await supabase.auth.signInWithPassword({
+            email: trimmedEmail,
+            password
+        });
 
-            if (error) {
-                return res.status(401).json({ error: error.message });
-            }
-
-            return res.json({
-                token: data.session.access_token,
-                user: {
-                    id: data.user.id,
-                    email: data.user.email,
-                    role: 'admin'
-                }
-            });
-        } else {
-            // Local fallback Authentication
-            const adminEmail = process.env.ADMIN_EMAIL || 'admin@local.portfolio';
-            // If ADMIN_PASSWORD is not set, default to 'admin123'
-            const adminPassword = process.env.ADMIN_PASSWORD || 'admin123';
-
-            if (email === adminEmail && password === adminPassword) {
-                return res.json({
-                    token: 'mock-admin-token',
-                    user: {
-                        email,
-                        role: 'admin'
-                    }
-                });
-            }
-
+        if (error || !data?.session) {
             return res.status(401).json({ error: 'Invalid email or password' });
         }
+
+        return res.json({
+            token: data.session.access_token,
+            user: {
+                id: data.user.id,
+                email: data.user.email,
+                role: 'admin'
+            }
+        });
     } catch (error) {
-        console.error('Authentication logic error:', error);
+        console.error('[Auth Controller] Login exception:', error.message);
         return res.status(500).json({ error: 'Internal server error during authentication' });
     }
 };
