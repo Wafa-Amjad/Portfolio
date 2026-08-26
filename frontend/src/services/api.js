@@ -1,7 +1,11 @@
 import axios from 'axios';
 
+// Load Backend API Base URL from environment (e.g. Render backend URL or empty string for local dev proxy)
+const rawBaseURL = import.meta.env.VITE_API_BASE_URL || import.meta.env.VITE_API_URL || '';
+const API_BASE_URL = rawBaseURL.endsWith('/') ? rawBaseURL.slice(0, -1) : rawBaseURL;
+
 const api = axios.create({
-    baseURL: '', // Handled by Vite proxy during development and same-domain in production
+    baseURL: API_BASE_URL,
 });
 
 // Automatically inject Authorization Bearer token if it exists in localStorage
