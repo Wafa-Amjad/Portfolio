@@ -1,16 +1,13 @@
 import React from 'react';
 import { usePortfolio } from '../context/PortfolioContext';
 import { Award, Calendar, ExternalLink, ShieldCheck } from 'lucide-react';
+import LoadingScreen from '../components/LoadingScreen';
 
 const Certifications = () => {
     const { certifications, loading } = usePortfolio();
 
     if (loading) {
-        return (
-            <div className="container" style={{ padding: '80px 0', textAlign: 'center' }}>
-                <p style={{ color: 'var(--text-muted)' }}>Loading achievements inventory...</p>
-            </div>
-        );
+        return <LoadingScreen message="Loading certification credentials..." />;
     }
 
     return (

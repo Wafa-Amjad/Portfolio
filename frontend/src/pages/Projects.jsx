@@ -2,17 +2,14 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { usePortfolio } from '../context/PortfolioContext';
 import { Github, ExternalLink, Filter } from 'lucide-react';
+import LoadingScreen from '../components/LoadingScreen';
 
 const Projects = () => {
     const { projects, loading } = usePortfolio();
     const [selectedCategory, setSelectedCategory] = useState('All');
 
     if (loading) {
-        return (
-            <div className="container" style={{ padding: '80px 0', textAlign: 'center' }}>
-                <p style={{ color: 'var(--text-muted)' }}>Loading projects catalog...</p>
-            </div>
-        );
+        return <LoadingScreen message="Loading projects portfolio..." />;
     }
 
     // Extract unique categories, sorting them

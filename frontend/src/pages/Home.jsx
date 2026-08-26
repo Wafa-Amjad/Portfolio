@@ -2,16 +2,13 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowRight, Github, Linkedin, Mail, ExternalLink, Code2 } from 'lucide-react';
 import { usePortfolio } from '../context/PortfolioContext';
+import LoadingScreen from '../components/LoadingScreen';
 
 const Home = () => {
     const { profile, projects, loading } = usePortfolio();
 
     if (loading) {
-        return (
-            <div style={{ padding: '80px 0', textAlign: 'center', fontFamily: 'var(--font-sans)', minHeight: '50vh' }}>
-                <p style={{ color: 'var(--text-muted)' }}>Loading developer profile...</p>
-            </div>
-        );
+        return <LoadingScreen message="Initializing portfolio..." />;
     }
 
     const featuredProjects = projects.filter(p => p.featured === true || p.featured === 'true').slice(0, 3);

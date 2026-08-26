@@ -1,16 +1,13 @@
 import React from 'react';
 import { usePortfolio } from '../context/PortfolioContext';
 import { Calendar, GraduationCap, MapPin } from 'lucide-react';
+import LoadingScreen from '../components/LoadingScreen';
 
 const Education = () => {
     const { education, loading } = usePortfolio();
 
     if (loading) {
-        return (
-            <div className="container" style={{ padding: '80px 0', textAlign: 'center' }}>
-                <p style={{ color: 'var(--text-muted)' }}>Loading academic logs...</p>
-            </div>
-        );
+        return <LoadingScreen message="Loading academic background records..." />;
     }
 
     return (

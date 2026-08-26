@@ -1,16 +1,13 @@
 import React from 'react';
 import { usePortfolio } from '../context/PortfolioContext';
 import { Calendar, Briefcase, ChevronRight } from 'lucide-react';
+import LoadingScreen from '../components/LoadingScreen';
 
 const Experience = () => {
     const { experience, loading } = usePortfolio();
 
     if (loading) {
-        return (
-            <div className="container" style={{ padding: '80px 0', textAlign: 'center' }}>
-                <p style={{ color: 'var(--text-muted)' }}>Loading experience logs...</p>
-            </div>
-        );
+        return <LoadingScreen message="Loading professional experience logs..." />;
     }
 
     return (

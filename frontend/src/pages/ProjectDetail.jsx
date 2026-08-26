@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { apiService } from '../services/api';
 import { Github, ExternalLink, ArrowLeft, Terminal, Server, Layout, Database, Check } from 'lucide-react';
+import LoadingScreen from '../components/LoadingScreen';
 
 const ProjectDetail = () => {
     const { id } = useParams();
@@ -27,11 +28,7 @@ const ProjectDetail = () => {
     }, [id]);
 
     if (loading) {
-        return (
-            <div className="container" style={{ padding: '80px 0', textAlign: 'center' }}>
-                <p style={{ color: 'var(--text-muted)' }}>Retrieving project specifications...</p>
-            </div>
-        );
+        return <LoadingScreen message="Retrieving project specifications..." />;
     }
 
     if (error || !project) {

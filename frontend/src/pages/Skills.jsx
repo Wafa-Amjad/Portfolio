@@ -1,15 +1,12 @@
 import React from 'react';
 import { usePortfolio } from '../context/PortfolioContext';
+import LoadingScreen from '../components/LoadingScreen';
 
 const Skills = () => {
     const { skills, loading } = usePortfolio();
 
     if (loading) {
-        return (
-            <div className="container" style={{ padding: '80px 0', textAlign: 'center' }}>
-                <p style={{ color: 'var(--text-muted)' }}>Loading skills inventory...</p>
-            </div>
-        );
+        return <LoadingScreen message="Loading technical skills inventory..." />;
     }
 
     // Group skills by category
