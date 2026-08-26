@@ -18,31 +18,18 @@ const PORT = process.env.PORT || 5000;
 // Security HTTP Headers
 app.use(securityHeaders);
 
-// Configurable CORS Policy
-const allowedOrigins = process.env.ALLOWED_ORIGINS
-    ? process.env.ALLOWED_ORIGINS.split(',').map(o => o.trim())
-    : [
-        'http://localhost:3000',
-        'http://localhost:5173',
-        'http://127.0.0.1:3000',
-        'http://127.0.0.1:5173'
-    ];
-
-app.use(cors({
-    origin: (origin, callback) => {
-        // Allow requests with no origin (like mobile apps, curl, or same-origin)
-        if (!origin) return callback(null, true);
-        if (process.env.NODE_ENV !== 'production' || allowedOrigins.includes(origin) || allowedOrigins.includes('*')) {
-            return callback(null, true);
-        }
-        return callback(new Error('Cross-Origin Request Blocked by Security Policy'));
-    },
+// Open CORS Policy for Portfolio API
+const corsOptions = {
+    origin: '*',
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization'],
-    credentials: true
-}));
+    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
+    optionsSuccessStatus: 200
+};
 
-// Body parsing with payload size limit (Prevent denial-of-service via huge payloads)
+app.use(cors(corsOptions));
+app.options('*', cors(corsOptions));
+
+// Body parsing with payload size limit
 app.use(express.json({ limit: '500kb' }));
 app.use(express.urlencoded({ extended: true, limit: '500kb' }));
 
@@ -65,7 +52,7 @@ app.get('/health', (req, res) => {
     });
 });
 
-// Production: Serve React Frontend static files
+// Production: Serve React Frontend static files if hosted monolithically
 const frontendDistPath = path.join(__dirname, '../frontend/dist');
 app.use(express.static(frontendDistPath));
 
@@ -81,7 +68,6 @@ app.get('*', (req, res) => {
         <div style="font-family: sans-serif; padding: 40px; text-align: center;">
           <h2>Wafa Amjad - Portfolio API</h2>
           <p>The backend server is running successfully on port ${PORT}.</p>
-          <p>Please launch the React frontend by running <code>npm run dev</code> inside the <code>frontend</code> folder.</p>
         </div>
       `);
         }
