@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { usePortfolio } from '../context/PortfolioContext';
 import { apiService } from '../services/api';
 import { Plus, Trash2, Calendar, Award } from 'lucide-react';
+import SideSheet from '../components/SideSheet';
 
 const AdminCertifications = () => {
     const { certifications, refreshData } = usePortfolio();
@@ -77,43 +78,41 @@ const AdminCertifications = () => {
                     <h2 style={{ fontFamily: 'var(--font-serif)', fontSize: '2rem' }}>Manage Certifications</h2>
                     <p style={{ color: 'var(--text-muted)', fontSize: '0.95rem' }}>Configure professional achievements and cert validation URLs</p>
                 </div>
-                {!formOpen && (
-                    <button onClick={() => setFormOpen(true)} className="btn-primary" style={{ gap: '6px' }}>
-                        <Plus size={16} /> Add Certification
-                    </button>
-                )}
+                <button onClick={() => setFormOpen(true)} className="btn-primary" style={{ gap: '6px' }}>
+                    <Plus size={16} /> Add Certification
+                </button>
             </div>
 
-            {formOpen && (
-                <form onSubmit={handleSubmit} style={{ border: '1px solid var(--border-color)', padding: '32px', backgroundColor: 'var(--bg-secondary)', marginBottom: '32px' }}>
-                    <h3 style={{ fontFamily: 'var(--font-serif)', fontSize: '1.25rem', marginBottom: '20px' }}>
-                        Add Certification / Achievement
-                    </h3>
-
+            {/* SideSheet Form Drawer */}
+            <SideSheet
+                isOpen={formOpen}
+                onClose={resetForm}
+                title="Add Certification / Achievement"
+                subtitle="Record professional certificates, credential IDs, and verification URLs."
+            >
+                <form onSubmit={handleSubmit}>
                     {error && (
-                        <div style={{ padding: '10px', backgroundColor: '#fef2f2', border: '1px solid #fecaca', color: '#991b1b', fontSize: '0.85rem', marginBottom: '16px' }}>
+                        <div style={{ padding: '12px 16px', backgroundColor: '#fef2f2', border: '1px solid #fecaca', color: '#991b1b', fontSize: '0.85rem', marginBottom: '20px' }}>
                             {error}
                         </div>
                     )}
 
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }} className="grid-2">
-                        <div className="form-group">
-                            <label className="form-label">Certification Name *</label>
-                            <input type="text" name="name" className="form-control" value={formData.name} onChange={handleChange} placeholder="e.g. Meta Front-End Developer" required />
-                        </div>
-
-                        <div className="form-group">
-                            <label className="form-label">Issuing Organization *</label>
-                            <input type="text" name="issuing_organization" className="form-control" value={formData.issuing_organization} onChange={handleChange} placeholder="e.g. Coursera / Meta" required />
-                        </div>
+                    <div className="form-group">
+                        <label className="form-label">Certification Name *</label>
+                        <input type="text" name="name" className="form-control" value={formData.name} onChange={handleChange} placeholder="e.g. Meta Front-End Developer" required />
                     </div>
 
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '16px' }} className="form-grid-3">
-                        <div className="form-group">
-                            <label className="form-label">Credential ID</label>
-                            <input type="text" name="credential_id" className="form-control" value={formData.credential_id} onChange={handleChange} placeholder="e.g. CERT-102938" />
-                        </div>
+                    <div className="form-group">
+                        <label className="form-label">Issuing Organization *</label>
+                        <input type="text" name="issuing_organization" className="form-control" value={formData.issuing_organization} onChange={handleChange} placeholder="e.g. Coursera / Meta" required />
+                    </div>
 
+                    <div className="form-group">
+                        <label className="form-label">Credential ID</label>
+                        <input type="text" name="credential_id" className="form-control" value={formData.credential_id} onChange={handleChange} placeholder="e.g. CERT-102938" />
+                    </div>
+
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
                         <div className="form-group">
                             <label className="form-label">Issue Date</label>
                             <input type="text" name="issue_date" className="form-control" value={formData.issue_date} onChange={handleChange} placeholder="e.g. Nov 2023" />
@@ -125,13 +124,13 @@ const AdminCertifications = () => {
                         </div>
                     </div>
 
-                    <div className="form-group">
+                    <div className="form-group" style={{ marginBottom: '28px' }}>
                         <label className="form-label">Verification URL</label>
                         <input type="url" name="credential_url" className="form-control" value={formData.credential_url} onChange={handleChange} placeholder="https://coursera.org/verify/..." />
                     </div>
 
                     <div style={{ display: 'flex', gap: '12px' }}>
-                        <button type="submit" className="btn-primary" disabled={loading}>
+                        <button type="submit" className="btn-primary" style={{ flex: 1, justifyContent: 'center' }} disabled={loading}>
                             {loading ? 'Recording...' : 'Record Certification'}
                         </button>
                         <button type="button" onClick={resetForm} className="btn-secondary">
@@ -139,7 +138,7 @@ const AdminCertifications = () => {
                         </button>
                     </div>
                 </form>
-            )}
+            </SideSheet>
 
             {/* Grid listing array */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>

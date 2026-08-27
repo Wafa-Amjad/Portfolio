@@ -15,7 +15,7 @@ import {
 import { usePortfolio } from '../context/PortfolioContext';
 
 const AdminLayout = () => {
-    const { token, logoutAdmin, user } = usePortfolio();
+    const { token, logoutAdmin, user, unreadCount } = usePortfolio();
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -105,7 +105,21 @@ const AdminLayout = () => {
                         </li>
                         <li>
                             <NavLink to="/admin/messages" className={({ isActive }) => `sidebar-link ${isActive ? 'active' : ''}`}>
-                                <Mail size={18} /> Messages
+                                <Mail size={18} />
+                                <span style={{ flex: 1 }}>Messages</span>
+                                {unreadCount > 0 && (
+                                    <span style={{
+                                        backgroundColor: '#ef4444',
+                                        color: '#ffffff',
+                                        borderRadius: '10px',
+                                        padding: '2px 8px',
+                                        fontSize: '0.75rem',
+                                        fontWeight: '700',
+                                        lineHeight: 1
+                                    }}>
+                                        {unreadCount}
+                                    </span>
+                                )}
                             </NavLink>
                         </li>
                     </ul>

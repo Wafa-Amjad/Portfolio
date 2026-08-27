@@ -52,16 +52,20 @@ async function writeLocalDb(data) {
 }
 
 // -------------------------------------------------------------
-// Database Operations Service
+// Database Operations Service with Automatic Local Fallback
 // -------------------------------------------------------------
 
 export const dbService = {
     // -- PROFILE --
     getProfile: async () => {
         if (isSupabaseActive()) {
-            const { data, error } = await supabase.from('profiles').select('*').limit(1).maybeSingle();
-            if (!error && data) return data;
-            if (error) console.error('[Supabase] getProfile error:', error.message);
+            try {
+                const { data, error } = await supabase.from('profiles').select('*').limit(1).maybeSingle();
+                if (!error && data) return data;
+                if (error) console.warn('[Supabase] getProfile error, using local DB:', error.message);
+            } catch (err) {
+                console.warn('[Supabase] getProfile unreachable, using local DB:', err.message);
+            }
         }
         const db = await readLocalDb();
         return db.profile;
@@ -83,27 +87,23 @@ export const dbService = {
         };
 
         if (isSupabaseActive()) {
-            // Find if a profile already exists
-            const { data: existingProfile } = await supabase.from('profiles').select('id').limit(1).maybeSingle();
+            try {
+                const { data: existingProfile } = await supabase.from('profiles').select('id').limit(1).maybeSingle();
+                let targetId = existingProfile?.id || userId;
 
-            let targetId = existingProfile?.id || userId;
-
-            if (targetId) {
-                const { data, error } = await supabase
-                    .from('profiles')
-                    .upsert([{ id: targetId, ...cleanData }])
-                    .select()
-                    .single();
-
-                if (!error) return data;
-                console.error('[Supabase] updateProfile upsert error:', error.message);
-                throw new Error('Database error updating profile: ' + error.message);
-            } else {
-                // If no target ID exists yet, insert
-                const { data, error } = await supabase.from('profiles').insert([cleanData]).select().single();
-                if (!error) return data;
-                console.error('[Supabase] updateProfile insert error:', error.message);
-                throw new Error('Database error inserting profile: ' + error.message);
+                if (targetId) {
+                    const { data, error } = await supabase
+                        .from('profiles')
+                        .upsert([{ id: targetId, ...cleanData }])
+                        .select()
+                        .single();
+                    if (!error && data) return data;
+                } else {
+                    const { data, error } = await supabase.from('profiles').insert([cleanData]).select().single();
+                    if (!error && data) return data;
+                }
+            } catch (err) {
+                console.warn('[Supabase] updateProfile failed, falling back to local DB:', err.message);
             }
         }
 
@@ -116,13 +116,17 @@ export const dbService = {
     // -- PROJECTS --
     getProjects: async () => {
         if (isSupabaseActive()) {
-            const { data, error } = await supabase
-                .from('projects')
-                .select('*')
-                .order('featured', { ascending: false })
-                .order('project_date', { ascending: false });
-            if (!error) return data;
-            console.error('[Supabase] getProjects error:', error.message);
+            try {
+                const { data, error } = await supabase
+                    .from('projects')
+                    .select('*')
+                    .order('featured', { ascending: false })
+                    .order('project_date', { ascending: false });
+                if (!error && data) return data;
+                if (error) console.warn('[Supabase] getProjects error, using local DB:', error.message);
+            } catch (err) {
+                console.warn('[Supabase] getProjects unreachable, using local DB:', err.message);
+            }
         }
         const db = await readLocalDb();
         return [...(db.projects || [])].sort((a, b) => {
@@ -134,9 +138,12 @@ export const dbService = {
 
     getProjectById: async (id) => {
         if (isSupabaseActive()) {
-            const { data, error } = await supabase.from('projects').select('*').eq('id', id).maybeSingle();
-            if (!error && data) return data;
-            if (error) console.error('[Supabase] getProjectById error:', error.message);
+            try {
+                const { data, error } = await supabase.from('projects').select('*').eq('id', id).maybeSingle();
+                if (!error && data) return data;
+            } catch (err) {
+                console.warn('[Supabase] getProjectById error, using local DB:', err.message);
+            }
         }
         const db = await readLocalDb();
         return (db.projects || []).find(p => p.id === id) || null;
@@ -148,7 +155,7 @@ export const dbService = {
             short_description: sanitizeString(projectData.short_description, 500),
             detailed_description: sanitizeString(projectData.detailed_description, 5000),
             category: sanitizeString(projectData.category, 100),
-            technologies: Array.isArray(projectData.technologies) 
+            technologies: Array.isArray(projectData.technologies)
                 ? projectData.technologies.map(t => sanitizeString(t, 50)).filter(Boolean)
                 : [],
             image_url: sanitizeUrl(projectData.image_url),
@@ -156,7 +163,7 @@ export const dbService = {
             live_url: sanitizeUrl(projectData.live_url),
             featured: Boolean(projectData.featured),
             project_date: projectData.project_date ? String(projectData.project_date).slice(0, 10) : null,
-            highlights: Array.isArray(projectData.highlights) 
+            highlights: Array.isArray(projectData.highlights)
                 ? projectData.highlights.map(h => sanitizeString(h, 200)).filter(Boolean)
                 : [],
             role: sanitizeString(projectData.role, 100),
@@ -165,10 +172,13 @@ export const dbService = {
         };
 
         if (isSupabaseActive()) {
-            const { data, error } = await supabase.from('projects').insert([cleanProject]).select().single();
-            if (!error) return data;
-            console.error('[Supabase] createProject error:', error.message);
-            throw new Error(error.message);
+            try {
+                const { data, error } = await supabase.from('projects').insert([cleanProject]).select().single();
+                if (!error && data) return data;
+                console.warn('[Supabase] createProject failed, saving locally:', error?.message);
+            } catch (err) {
+                console.warn('[Supabase] createProject unreachable, saving locally:', err.message);
+            }
         }
 
         const db = await readLocalDb();
@@ -188,7 +198,7 @@ export const dbService = {
             short_description: sanitizeString(projectData.short_description, 500),
             detailed_description: sanitizeString(projectData.detailed_description, 5000),
             category: sanitizeString(projectData.category, 100),
-            technologies: Array.isArray(projectData.technologies) 
+            technologies: Array.isArray(projectData.technologies)
                 ? projectData.technologies.map(t => sanitizeString(t, 50)).filter(Boolean)
                 : [],
             image_url: sanitizeUrl(projectData.image_url),
@@ -196,7 +206,7 @@ export const dbService = {
             live_url: sanitizeUrl(projectData.live_url),
             featured: Boolean(projectData.featured),
             project_date: projectData.project_date ? String(projectData.project_date).slice(0, 10) : null,
-            highlights: Array.isArray(projectData.highlights) 
+            highlights: Array.isArray(projectData.highlights)
                 ? projectData.highlights.map(h => sanitizeString(h, 200)).filter(Boolean)
                 : [],
             role: sanitizeString(projectData.role, 100),
@@ -205,10 +215,13 @@ export const dbService = {
         };
 
         if (isSupabaseActive()) {
-            const { data, error } = await supabase.from('projects').update(cleanProject).eq('id', id).select().single();
-            if (!error) return data;
-            console.error('[Supabase] updateProject error:', error.message);
-            throw new Error(error.message);
+            try {
+                const { data, error } = await supabase.from('projects').update(cleanProject).eq('id', id).select().single();
+                if (!error && data) return data;
+                console.warn('[Supabase] updateProject failed, updating locally:', error?.message);
+            } catch (err) {
+                console.warn('[Supabase] updateProject unreachable, updating locally:', err.message);
+            }
         }
 
         const db = await readLocalDb();
@@ -225,10 +238,13 @@ export const dbService = {
 
     deleteProject: async (id) => {
         if (isSupabaseActive()) {
-            const { error } = await supabase.from('projects').delete().eq('id', id);
-            if (!error) return true;
-            console.error('[Supabase] deleteProject error:', error.message);
-            throw new Error(error.message);
+            try {
+                const { error } = await supabase.from('projects').delete().eq('id', id);
+                if (!error) return true;
+                console.warn('[Supabase] deleteProject failed, deleting locally:', error?.message);
+            } catch (err) {
+                console.warn('[Supabase] deleteProject unreachable, deleting locally:', err.message);
+            }
         }
 
         const db = await readLocalDb();
@@ -242,9 +258,13 @@ export const dbService = {
     // -- SKILLS --
     getSkills: async () => {
         if (isSupabaseActive()) {
-            const { data, error } = await supabase.from('skills').select('*').order('display_order', { ascending: true });
-            if (!error) return data;
-            console.error('[Supabase] getSkills error:', error.message);
+            try {
+                const { data, error } = await supabase.from('skills').select('*').order('display_order', { ascending: true });
+                if (!error && data) return data;
+                if (error) console.warn('[Supabase] getSkills error, using local DB:', error.message);
+            } catch (err) {
+                console.warn('[Supabase] getSkills unreachable, using local DB:', err.message);
+            }
         }
         const db = await readLocalDb();
         return [...(db.skills || [])].sort((a, b) => a.display_order - b.display_order);
@@ -259,10 +279,13 @@ export const dbService = {
         };
 
         if (isSupabaseActive()) {
-            const { data, error } = await supabase.from('skills').insert([cleanSkill]).select().single();
-            if (!error) return data;
-            console.error('[Supabase] createSkill error:', error.message);
-            throw new Error(error.message);
+            try {
+                const { data, error } = await supabase.from('skills').insert([cleanSkill]).select().single();
+                if (!error && data) return data;
+                console.warn('[Supabase] createSkill failed, saving locally:', error?.message);
+            } catch (err) {
+                console.warn('[Supabase] createSkill unreachable, saving locally:', err.message);
+            }
         }
 
         const db = await readLocalDb();
@@ -286,10 +309,13 @@ export const dbService = {
         };
 
         if (isSupabaseActive()) {
-            const { data, error } = await supabase.from('skills').update(cleanSkill).eq('id', id).select().single();
-            if (!error) return data;
-            console.error('[Supabase] updateSkill error:', error.message);
-            throw new Error(error.message);
+            try {
+                const { data, error } = await supabase.from('skills').update(cleanSkill).eq('id', id).select().single();
+                if (!error && data) return data;
+                console.warn('[Supabase] updateSkill failed, updating locally:', error?.message);
+            } catch (err) {
+                console.warn('[Supabase] updateSkill unreachable, updating locally:', err.message);
+            }
         }
 
         const db = await readLocalDb();
@@ -306,10 +332,13 @@ export const dbService = {
 
     deleteSkill: async (id) => {
         if (isSupabaseActive()) {
-            const { error } = await supabase.from('skills').delete().eq('id', id);
-            if (!error) return true;
-            console.error('[Supabase] deleteSkill error:', error.message);
-            throw new Error(error.message);
+            try {
+                const { error } = await supabase.from('skills').delete().eq('id', id);
+                if (!error) return true;
+                console.warn('[Supabase] deleteSkill failed, deleting locally:', error?.message);
+            } catch (err) {
+                console.warn('[Supabase] deleteSkill unreachable, deleting locally:', err.message);
+            }
         }
 
         const db = await readLocalDb();
@@ -323,9 +352,13 @@ export const dbService = {
     // -- EXPERIENCE --
     getExperience: async () => {
         if (isSupabaseActive()) {
-            const { data, error } = await supabase.from('experience').select('*').order('created_at', { ascending: false });
-            if (!error) return data;
-            console.error('[Supabase] getExperience error:', error.message);
+            try {
+                const { data, error } = await supabase.from('experience').select('*').order('created_at', { ascending: false });
+                if (!error && data) return data;
+                if (error) console.warn('[Supabase] getExperience error, using local DB:', error.message);
+            } catch (err) {
+                console.warn('[Supabase] getExperience unreachable, using local DB:', err.message);
+            }
         }
         const db = await readLocalDb();
         return db.experience || [];
@@ -350,10 +383,13 @@ export const dbService = {
         };
 
         if (isSupabaseActive()) {
-            const { data, error } = await supabase.from('experience').insert([cleanExp]).select().single();
-            if (!error) return data;
-            console.error('[Supabase] createExperience error:', error.message);
-            throw new Error(error.message);
+            try {
+                const { data, error } = await supabase.from('experience').insert([cleanExp]).select().single();
+                if (!error && data) return data;
+                console.warn('[Supabase] createExperience failed, saving locally:', error?.message);
+            } catch (err) {
+                console.warn('[Supabase] createExperience unreachable, saving locally:', err.message);
+            }
         }
 
         const db = await readLocalDb();
@@ -386,10 +422,13 @@ export const dbService = {
         };
 
         if (isSupabaseActive()) {
-            const { data, error } = await supabase.from('experience').update(cleanExp).eq('id', id).select().single();
-            if (!error) return data;
-            console.error('[Supabase] updateExperience error:', error.message);
-            throw new Error(error.message);
+            try {
+                const { data, error } = await supabase.from('experience').update(cleanExp).eq('id', id).select().single();
+                if (!error && data) return data;
+                console.warn('[Supabase] updateExperience failed, updating locally:', error?.message);
+            } catch (err) {
+                console.warn('[Supabase] updateExperience unreachable, updating locally:', err.message);
+            }
         }
 
         const db = await readLocalDb();
@@ -406,10 +445,13 @@ export const dbService = {
 
     deleteExperience: async (id) => {
         if (isSupabaseActive()) {
-            const { error } = await supabase.from('experience').delete().eq('id', id);
-            if (!error) return true;
-            console.error('[Supabase] deleteExperience error:', error.message);
-            throw new Error(error.message);
+            try {
+                const { error } = await supabase.from('experience').delete().eq('id', id);
+                if (!error) return true;
+                console.warn('[Supabase] deleteExperience failed, deleting locally:', error?.message);
+            } catch (err) {
+                console.warn('[Supabase] deleteExperience unreachable, deleting locally:', err.message);
+            }
         }
 
         const db = await readLocalDb();
@@ -423,9 +465,13 @@ export const dbService = {
     // -- EDUCATION --
     getEducation: async () => {
         if (isSupabaseActive()) {
-            const { data, error } = await supabase.from('education').select('*').order('created_at', { ascending: false });
-            if (!error) return data;
-            console.error('[Supabase] getEducation error:', error.message);
+            try {
+                const { data, error } = await supabase.from('education').select('*').order('created_at', { ascending: false });
+                if (!error && data) return data;
+                if (error) console.warn('[Supabase] getEducation error, using local DB:', error.message);
+            } catch (err) {
+                console.warn('[Supabase] getEducation unreachable, using local DB:', err.message);
+            }
         }
         const db = await readLocalDb();
         return db.education || [];
@@ -443,10 +489,13 @@ export const dbService = {
         };
 
         if (isSupabaseActive()) {
-            const { data, error } = await supabase.from('education').insert([cleanEdu]).select().single();
-            if (!error) return data;
-            console.error('[Supabase] createEducation error:', error.message);
-            throw new Error(error.message);
+            try {
+                const { data, error } = await supabase.from('education').insert([cleanEdu]).select().single();
+                if (!error && data) return data;
+                console.warn('[Supabase] createEducation failed, saving locally:', error?.message);
+            } catch (err) {
+                console.warn('[Supabase] createEducation unreachable, saving locally:', err.message);
+            }
         }
 
         const db = await readLocalDb();
@@ -472,10 +521,13 @@ export const dbService = {
         };
 
         if (isSupabaseActive()) {
-            const { data, error } = await supabase.from('education').update(cleanEdu).eq('id', id).select().single();
-            if (!error) return data;
-            console.error('[Supabase] updateEducation error:', error.message);
-            throw new Error(error.message);
+            try {
+                const { data, error } = await supabase.from('education').update(cleanEdu).eq('id', id).select().single();
+                if (!error && data) return data;
+                console.warn('[Supabase] updateEducation failed, updating locally:', error?.message);
+            } catch (err) {
+                console.warn('[Supabase] updateEducation unreachable, updating locally:', err.message);
+            }
         }
 
         const db = await readLocalDb();
@@ -492,10 +544,13 @@ export const dbService = {
 
     deleteEducation: async (id) => {
         if (isSupabaseActive()) {
-            const { error } = await supabase.from('education').delete().eq('id', id);
-            if (!error) return true;
-            console.error('[Supabase] deleteEducation error:', error.message);
-            throw new Error(error.message);
+            try {
+                const { error } = await supabase.from('education').delete().eq('id', id);
+                if (!error) return true;
+                console.warn('[Supabase] deleteEducation failed, deleting locally:', error?.message);
+            } catch (err) {
+                console.warn('[Supabase] deleteEducation unreachable, deleting locally:', err.message);
+            }
         }
 
         const db = await readLocalDb();
@@ -509,9 +564,13 @@ export const dbService = {
     // -- CERTIFICATIONS --
     getCertifications: async () => {
         if (isSupabaseActive()) {
-            const { data, error } = await supabase.from('certifications').select('*').order('created_at', { ascending: false });
-            if (!error) return data;
-            console.error('[Supabase] getCertifications error:', error.message);
+            try {
+                const { data, error } = await supabase.from('certifications').select('*').order('created_at', { ascending: false });
+                if (!error && data) return data;
+                if (error) console.warn('[Supabase] getCertifications error, using local DB:', error.message);
+            } catch (err) {
+                console.warn('[Supabase] getCertifications unreachable, using local DB:', err.message);
+            }
         }
         const db = await readLocalDb();
         return db.certifications || [];
@@ -528,10 +587,13 @@ export const dbService = {
         };
 
         if (isSupabaseActive()) {
-            const { data, error } = await supabase.from('certifications').insert([cleanCert]).select().single();
-            if (!error) return data;
-            console.error('[Supabase] createCertification error:', error.message);
-            throw new Error(error.message);
+            try {
+                const { data, error } = await supabase.from('certifications').insert([cleanCert]).select().single();
+                if (!error && data) return data;
+                console.warn('[Supabase] createCertification failed, saving locally:', error?.message);
+            } catch (err) {
+                console.warn('[Supabase] createCertification unreachable, saving locally:', err.message);
+            }
         }
 
         const db = await readLocalDb();
@@ -556,10 +618,13 @@ export const dbService = {
         };
 
         if (isSupabaseActive()) {
-            const { data, error } = await supabase.from('certifications').update(cleanCert).eq('id', id).select().single();
-            if (!error) return data;
-            console.error('[Supabase] updateCertification error:', error.message);
-            throw new Error(error.message);
+            try {
+                const { data, error } = await supabase.from('certifications').update(cleanCert).eq('id', id).select().single();
+                if (!error && data) return data;
+                console.warn('[Supabase] updateCertification failed, updating locally:', error?.message);
+            } catch (err) {
+                console.warn('[Supabase] updateCertification unreachable, updating locally:', err.message);
+            }
         }
 
         const db = await readLocalDb();
@@ -577,10 +642,13 @@ export const dbService = {
 
     deleteCertification: async (id) => {
         if (isSupabaseActive()) {
-            const { error } = await supabase.from('certifications').delete().eq('id', id);
-            if (!error) return true;
-            console.error('[Supabase] deleteCertification error:', error.message);
-            throw new Error(error.message);
+            try {
+                const { error } = await supabase.from('certifications').delete().eq('id', id);
+                if (!error) return true;
+                console.warn('[Supabase] deleteCertification failed, deleting locally:', error?.message);
+            } catch (err) {
+                console.warn('[Supabase] deleteCertification unreachable, deleting locally:', err.message);
+            }
         }
 
         const db = await readLocalDb();
@@ -595,9 +663,13 @@ export const dbService = {
     // -- MESSAGES --
     getMessages: async () => {
         if (isSupabaseActive()) {
-            const { data, error } = await supabase.from('messages').select('*').order('created_at', { ascending: false });
-            if (!error) return data;
-            console.error('[Supabase] getMessages error:', error.message);
+            try {
+                const { data, error } = await supabase.from('messages').select('*').order('created_at', { ascending: false });
+                if (!error && data) return data;
+                if (error) console.warn('[Supabase] getMessages error, using local DB:', error.message);
+            } catch (err) {
+                console.warn('[Supabase] getMessages unreachable, using local DB:', err.message);
+            }
         }
         const db = await readLocalDb();
         return [...(db.messages || [])].sort((a, b) => new Date(b.created_at || 0) - new Date(a.created_at || 0));
@@ -614,10 +686,13 @@ export const dbService = {
         };
 
         if (isSupabaseActive()) {
-            const { data, error } = await supabase.from('messages').insert([enrichedMessage]).select().single();
-            if (!error) return data;
-            console.error('[Supabase] createMessage error:', error.message);
-            throw new Error(error.message);
+            try {
+                const { data, error } = await supabase.from('messages').insert([enrichedMessage]).select().single();
+                if (!error && data) return data;
+                console.warn('[Supabase] createMessage failed, saving locally:', error?.message);
+            } catch (err) {
+                console.warn('[Supabase] createMessage unreachable, saving locally:', err.message);
+            }
         }
 
         const db = await readLocalDb();
@@ -633,10 +708,13 @@ export const dbService = {
 
     markMessageRead: async (id, isRead = true) => {
         if (isSupabaseActive()) {
-            const { data, error } = await supabase.from('messages').update({ read: Boolean(isRead) }).eq('id', id).select().single();
-            if (!error) return data;
-            console.error('[Supabase] markMessageRead error:', error.message);
-            throw new Error(error.message);
+            try {
+                const { data, error } = await supabase.from('messages').update({ read: Boolean(isRead) }).eq('id', id).select().single();
+                if (!error && data) return data;
+                console.warn('[Supabase] markMessageRead failed, updating locally:', error?.message);
+            } catch (err) {
+                console.warn('[Supabase] markMessageRead unreachable, updating locally:', err.message);
+            }
         }
 
         const db = await readLocalDb();
@@ -649,10 +727,13 @@ export const dbService = {
 
     deleteMessage: async (id) => {
         if (isSupabaseActive()) {
-            const { error } = await supabase.from('messages').delete().eq('id', id);
-            if (!error) return true;
-            console.error('[Supabase] deleteMessage error:', error.message);
-            throw new Error(error.message);
+            try {
+                const { error } = await supabase.from('messages').delete().eq('id', id);
+                if (!error) return true;
+                console.warn('[Supabase] deleteMessage failed, deleting locally:', error?.message);
+            } catch (err) {
+                console.warn('[Supabase] deleteMessage unreachable, deleting locally:', err.message);
+            }
         }
 
         const db = await readLocalDb();

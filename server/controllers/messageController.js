@@ -1,4 +1,5 @@
 import { dbService } from '../services/db.js';
+import { sendContactNotificationEmail } from '../services/emailService.js';
 
 // Simple email regex validation
 const isValidEmail = (email) => {
@@ -54,6 +55,15 @@ export const createMessage = async (req, res) => {
             subject: subject.trim(),
             message: message.trim()
         });
+
+        // Trigger direct email notification to wafaamjad058@gmail.com
+        sendContactNotificationEmail({
+            name: name.trim(),
+            email: email.trim().toLowerCase(),
+            subject: subject.trim(),
+            message: message.trim()
+        }).catch(err => console.error('[Message Controller] Email dispatch async error:', err));
+
         res.status(201).json(newMsg);
     } catch (error) {
         console.error('[Message Controller] createMessage error:', error.message);

@@ -6,8 +6,8 @@
     "email": "wafaamjad058@gmail.com",
     "bio": "I am a Computer Science undergraduate at COMSATS University Islamabad, Abbottabad Campus, with practical experience in building full-stack web and mobile applications. I specialize in designing backend REST APIs, optimizing relational and non-relational databases, and crafting responsive user interfaces. I love solving algorithmic challenges and applying modern software engineering principles to real-world systems.",
     "long_bio": "Pursuing my BS in Computer Science (2023-2027), I have developed a strong foundation in Object-Oriented Programming, Data Structures, Algorithms, and Software Architecture. As a developer, I aim to build secure, robust, and scalable solutions that bridge the gap between high-level engineering designs and everyday utility. Through academic projects and professional internships, I have completed multiple full-stack systems with authentication, database integration, and high performance.",
-    "github_url": "https://github.com/wafaamjad",
-    "linkedin_url": "https://linkedin.com/in/wafaamjad",
+    "github_url": "https://github.com/Wafa-Amjad",
+    "linkedin_url": "https://www.linkedin.com/in/wafa-a-639a78329/",
     "resume_url": "#",
     "profile_image": ""
   },
@@ -274,6 +274,25 @@
       "role": "Backend Architect & Developer",
       "database_tech": "SQL Server",
       "project_type": "Internship Project"
+    },
+    {
+      "title": "Test Persist Project",
+      "short_description": "Test desc",
+      "detailed_description": "Detailed test",
+      "category": "Web App",
+      "technologies": [
+        "React"
+      ],
+      "image_url": "",
+      "github_url": "",
+      "live_url": "",
+      "featured": true,
+      "project_date": null,
+      "highlights": [],
+      "role": "",
+      "database_tech": "",
+      "project_type": "",
+      "id": "p_mtbu64us46o1"
     }
   ],
   "skills": [
@@ -484,7 +503,7 @@
     },
     {
       "id": "e2",
-      "company": "M-Tech Production",
+      "company": "M-Tech Production & Marketing",
       "position": "App Development Intern",
       "start_date": "Jul 2025",
       "end_date": "Aug 2025",
@@ -516,8 +535,8 @@
     {
       "id": "edu2",
       "institution": "Army Public College",
-      "degree": "FSc (Pre-Engineering)",
-      "field_of_study": "Pre-Engineering / High School",
+      "degree": "FSc (Pre-Medical)",
+      "field_of_study": "Pre-Medical / High School",
       "start_date": "2021",
       "end_date": "2023",
       "grade": "Matriculation and FSc completed",
@@ -525,5 +544,24 @@
     }
   ],
   "certifications": [],
-  "messages": []
+  "messages": [
+    {
+      "name": "Test Visitor",
+      "email": "visitor@example.com",
+      "subject": "Inquiry",
+      "message": "Hello Wafa!",
+      "read": false,
+      "created_at": "2026-08-27T18:08:20.502Z",
+      "id": "m_mtbu64vd527l"
+    },
+    {
+      "name": "Wafa Amjad",
+      "email": "wafa85757@gmail.com",
+      "subject": "test",
+      "message": "hi",
+      "read": false,
+      "created_at": "2026-08-27T20:15:14.782Z",
+      "id": "m_mtbypc2ntjk0"
+    }
+  ]
 }

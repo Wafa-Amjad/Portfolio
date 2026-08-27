@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { usePortfolio } from '../context/PortfolioContext';
 import { apiService } from '../services/api';
 import { Plus, Trash2, Calendar, MapPin } from 'lucide-react';
+import SideSheet from '../components/SideSheet';
 
 const AdminEducation = () => {
     const { education, refreshData } = usePortfolio();
@@ -77,45 +78,43 @@ const AdminEducation = () => {
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
                 <div>
                     <h2 style={{ fontFamily: 'var(--font-serif)', fontSize: '2rem' }}>Manage Education</h2>
-                    <p style={{ color: 'var(--text-muted)', fontSize: '0.95rem' }}>Configure academic records and university stats Path</p>
+                    <p style={{ color: 'var(--text-muted)', fontSize: '0.95rem' }}>Configure academic records and education history</p>
                 </div>
-                {!formOpen && (
-                    <button onClick={() => setFormOpen(true)} className="btn-primary" style={{ gap: '6px' }}>
-                        <Plus size={16} /> Add Record
-                    </button>
-                )}
+                <button onClick={() => setFormOpen(true)} className="btn-primary" style={{ gap: '6px' }}>
+                    <Plus size={16} /> Add Record
+                </button>
             </div>
 
-            {formOpen && (
-                <form onSubmit={handleSubmit} style={{ border: '1px solid var(--border-color)', padding: '32px', backgroundColor: 'var(--bg-secondary)', marginBottom: '32px' }}>
-                    <h3 style={{ fontFamily: 'var(--font-serif)', fontSize: '1.25rem', marginBottom: '20px' }}>
-                        Add Academic Record
-                    </h3>
-
+            {/* SideSheet Form Drawer */}
+            <SideSheet
+                isOpen={formOpen}
+                onClose={resetForm}
+                title="Add Academic Record"
+                subtitle="Specify educational history, degree title, and graduation timeline."
+            >
+                <form onSubmit={handleSubmit}>
                     {error && (
-                        <div style={{ padding: '10px', backgroundColor: '#fef2f2', border: '1px solid #fecaca', color: '#991b1b', fontSize: '0.85rem', marginBottom: '16px' }}>
+                        <div style={{ padding: '12px 16px', backgroundColor: '#fef2f2', border: '1px solid #fecaca', color: '#991b1b', fontSize: '0.85rem', marginBottom: '20px' }}>
                             {error}
                         </div>
                     )}
 
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }} className="grid-2">
-                        <div className="form-group">
-                            <label className="form-label">Institution Name *</label>
-                            <input type="text" name="institution" className="form-control" value={formData.institution} onChange={handleChange} placeholder="e.g. COMSATS University Islamabad" required />
-                        </div>
-
-                        <div className="form-group">
-                            <label className="form-label">Degree *</label>
-                            <input type="text" name="degree" className="form-control" value={formData.degree} onChange={handleChange} placeholder="e.g. Bachelor of Science" required />
-                        </div>
+                    <div className="form-group">
+                        <label className="form-label">Institution Name *</label>
+                        <input type="text" name="institution" className="form-control" value={formData.institution} onChange={handleChange} placeholder="e.g. COMSATS University Islamabad" required />
                     </div>
 
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '16px' }} className="form-grid-3">
-                        <div className="form-group">
-                            <label className="form-label">Field of Study</label>
-                            <input type="text" name="field_of_study" className="form-control" value={formData.field_of_study} onChange={handleChange} placeholder="e.g. Computer Science" />
-                        </div>
+                    <div className="form-group">
+                        <label className="form-label">Degree *</label>
+                        <input type="text" name="degree" className="form-control" value={formData.degree} onChange={handleChange} placeholder="e.g. Bachelor of Science in Computer Science" required />
+                    </div>
 
+                    <div className="form-group">
+                        <label className="form-label">Field of Study</label>
+                        <input type="text" name="field_of_study" className="form-control" value={formData.field_of_study} onChange={handleChange} placeholder="e.g. Computer Science / Pre-Medical" />
+                    </div>
+
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
                         <div className="form-group">
                             <label className="form-label">Start Date *</label>
                             <input type="text" name="start_date" className="form-control" value={formData.start_date} onChange={handleChange} placeholder="e.g. 2023" required />
@@ -127,20 +126,18 @@ const AdminEducation = () => {
                         </div>
                     </div>
 
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }} className="grid-2">
-                        <div className="form-group">
-                            <label className="form-label">Grade / GPA (Optional)</label>
-                            <input type="text" name="grade" className="form-control" value={formData.grade} onChange={handleChange} placeholder="e.g. CGPA: 3.8/4.0" />
-                        </div>
+                    <div className="form-group">
+                        <label className="form-label">Grade / GPA (Optional)</label>
+                        <input type="text" name="grade" className="form-control" value={formData.grade} onChange={handleChange} placeholder="e.g. Expected Graduation: 2027" />
+                    </div>
 
-                        <div className="form-group">
-                            <label className="form-label">Location (Optional)</label>
-                            <input type="text" name="location" className="form-control" value={formData.location} onChange={handleChange} placeholder="e.g. Abbottabad, Abbottabad Campus" />
-                        </div>
+                    <div className="form-group" style={{ marginBottom: '28px' }}>
+                        <label className="form-label">Location (Optional)</label>
+                        <input type="text" name="location" className="form-control" value={formData.location} onChange={handleChange} placeholder="e.g. Abbottabad, KPK, Pakistan" />
                     </div>
 
                     <div style={{ display: 'flex', gap: '12px' }}>
-                        <button type="submit" className="btn-primary" disabled={loading}>
+                        <button type="submit" className="btn-primary" style={{ flex: 1, justifyContent: 'center' }} disabled={loading}>
                             {loading ? 'Recording...' : 'Record Education'}
                         </button>
                         <button type="button" onClick={resetForm} className="btn-secondary">
@@ -148,7 +145,7 @@ const AdminEducation = () => {
                         </button>
                     </div>
                 </form>
-            )}
+            </SideSheet>
 
             {/* Grid listing */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>

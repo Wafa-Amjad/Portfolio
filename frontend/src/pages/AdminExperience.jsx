@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { usePortfolio } from '../context/PortfolioContext';
 import { apiService } from '../services/api';
-import { Plus, Trash2, Calendar, FileText } from 'lucide-react';
+import { Plus, Trash2, Calendar } from 'lucide-react';
+import SideSheet from '../components/SideSheet';
 
 const AdminExperience = () => {
     const { experience, refreshData } = usePortfolio();
@@ -99,38 +100,36 @@ const AdminExperience = () => {
                     <h2 style={{ fontFamily: 'var(--font-serif)', fontSize: '2rem' }}>Manage Experience</h2>
                     <p style={{ color: 'var(--text-muted)', fontSize: '0.95rem' }}>Configure professional internships and work timelines</p>
                 </div>
-                {!formOpen && (
-                    <button onClick={() => setFormOpen(true)} className="btn-primary" style={{ gap: '6px' }}>
-                        <Plus size={16} /> Add Experience
-                    </button>
-                )}
+                <button onClick={() => setFormOpen(true)} className="btn-primary" style={{ gap: '6px' }}>
+                    <Plus size={16} /> Add Experience
+                </button>
             </div>
 
-            {formOpen && (
-                <form onSubmit={handleSubmit} style={{ border: '1px solid var(--border-color)', padding: '32px', backgroundColor: 'var(--bg-secondary)', marginBottom: '32px' }}>
-                    <h3 style={{ fontFamily: 'var(--font-serif)', fontSize: '1.25rem', marginBottom: '20px' }}>
-                        Record Work/Internship Experience
-                    </h3>
-
+            {/* SideSheet Form Drawer */}
+            <SideSheet
+                isOpen={formOpen}
+                onClose={resetForm}
+                title="Record Work/Internship Experience"
+                subtitle="Add details regarding your professional tenure, responsibilities, and technologies."
+            >
+                <form onSubmit={handleSubmit}>
                     {error && (
-                        <div style={{ padding: '10px', backgroundColor: '#fef2f2', border: '1px solid #fecaca', color: '#991b1b', fontSize: '0.85rem', marginBottom: '16px' }}>
+                        <div style={{ padding: '12px 16px', backgroundColor: '#fef2f2', border: '1px solid #fecaca', color: '#991b1b', fontSize: '0.85rem', marginBottom: '20px' }}>
                             {error}
                         </div>
                     )}
 
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }} className="grid-2">
-                        <div className="form-group">
-                            <label className="form-label">Position *</label>
-                            <input type="text" name="position" className="form-control" value={formData.position} onChange={handleChange} placeholder="e.g. Full-Stack Dev Intern" required />
-                        </div>
-
-                        <div className="form-group">
-                            <label className="form-label">Company Name *</label>
-                            <input type="text" name="company" className="form-control" value={formData.company} onChange={handleChange} placeholder="e.g. Tech Incubator" required />
-                        </div>
+                    <div className="form-group">
+                        <label className="form-label">Position *</label>
+                        <input type="text" name="position" className="form-control" value={formData.position} onChange={handleChange} placeholder="e.g. Full-Stack Dev Intern" required />
                     </div>
 
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '16px', alignItems: 'end' }} className="form-grid-3">
+                    <div className="form-group">
+                        <label className="form-label">Company Name *</label>
+                        <input type="text" name="company" className="form-control" value={formData.company} onChange={handleChange} placeholder="e.g. Tech Incubator" required />
+                    </div>
+
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
                         <div className="form-group">
                             <label className="form-label">Start Date *</label>
                             <input type="text" name="start_date" className="form-control" value={formData.start_date} onChange={handleChange} placeholder="e.g. Oct 2023" required />
@@ -148,20 +147,20 @@ const AdminExperience = () => {
                                 disabled={formData.current}
                             />
                         </div>
+                    </div>
 
-                        <div className="form-group" style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px' }}>
-                            <input
-                                type="checkbox"
-                                name="current"
-                                id="current"
-                                checked={formData.current}
-                                onChange={handleChange}
-                                style={{ width: '18px', height: '18px', cursor: 'pointer' }}
-                            />
-                            <label htmlFor="current" style={{ fontWeight: '600', fontSize: '0.85rem', cursor: 'pointer' }}>
-                                Currently working here
-                            </label>
-                        </div>
+                    <div className="form-group" style={{ display: 'flex', alignItems: 'center', gap: '8px', margin: '8px 0 20px 0' }}>
+                        <input
+                            type="checkbox"
+                            name="current"
+                            id="current"
+                            checked={formData.current}
+                            onChange={handleChange}
+                            style={{ width: '18px', height: '18px', cursor: 'pointer' }}
+                        />
+                        <label htmlFor="current" style={{ fontWeight: '600', fontSize: '0.85rem', cursor: 'pointer' }}>
+                            Currently working here
+                        </label>
                     </div>
 
                     <div className="form-group">
@@ -177,13 +176,13 @@ const AdminExperience = () => {
                         />
                     </div>
 
-                    <div className="form-group">
+                    <div className="form-group" style={{ marginBottom: '28px' }}>
                         <label className="form-label">Associated Technologies (comma separated)</label>
                         <input type="text" name="technologies" className="form-control" value={formData.technologies} onChange={handleChange} placeholder="Node.js, Express, PostgreSQL" />
                     </div>
 
                     <div style={{ display: 'flex', gap: '12px' }}>
-                        <button type="submit" className="btn-primary" disabled={loading}>
+                        <button type="submit" className="btn-primary" style={{ flex: 1, justifyContent: 'center' }} disabled={loading}>
                             {loading ? 'Recording...' : 'Record Experience'}
                         </button>
                         <button type="button" onClick={resetForm} className="btn-secondary">
@@ -191,7 +190,7 @@ const AdminExperience = () => {
                         </button>
                     </div>
                 </form>
-            )}
+            </SideSheet>
 
             {/* Experience Timeline details */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>

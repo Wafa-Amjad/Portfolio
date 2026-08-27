@@ -77,9 +77,32 @@ const AdminDashboard = () => {
     return (
         <div>
             <h2 style={{ fontFamily: 'var(--font-serif)', fontSize: '2rem', marginBottom: '8px' }}>Console Overview</h2>
-            <p style={{ color: 'var(--text-muted)', fontSize: '0.95rem', marginBottom: '32px' }}>
+            <p style={{ color: 'var(--text-muted)', fontSize: '0.95rem', marginBottom: '24px' }}>
                 Live metrics and controls of your developer portfolio
             </p>
+
+            {unreadMessagesCount > 0 && (
+                <div style={{
+                    backgroundColor: '#fef2f2',
+                    border: '1px solid #fecaca',
+                    padding: '16px 20px',
+                    marginBottom: '24px',
+                    borderRadius: '4px',
+                    display: 'flex',
+                    justify: 'space-between',
+                    alignItems: 'center'
+                }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px', color: '#991b1b' }}>
+                        <AlertCircle size={20} />
+                        <span style={{ fontWeight: '600', fontSize: '0.95rem' }}>
+                            You have {unreadMessagesCount} unread message{unreadMessagesCount > 1 ? 's' : ''} from portfolio visitors!
+                        </span>
+                    </div>
+                    <Link to="/admin/messages" className="btn-secondary" style={{ padding: '6px 12px', fontSize: '0.8rem', backgroundColor: '#ffffff' }}>
+                        View Inbox
+                    </Link>
+                </div>
+            )}
 
             {/* Grid of stats */}
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: '20px', marginBottom: '40px' }}>

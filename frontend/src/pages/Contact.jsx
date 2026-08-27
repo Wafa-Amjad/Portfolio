@@ -1,10 +1,8 @@
 import React, { useState } from 'react';
 import { apiService } from '../services/api';
-import { Mail, Send, AlertCircle, CheckCircle } from 'lucide-react';
-import { usePortfolio } from '../context/PortfolioContext';
+import { Send, AlertCircle, CheckCircle, MessageSquare } from 'lucide-react';
 
 const Contact = () => {
-    const { profile } = usePortfolio();
     const [formData, setFormData] = useState({
         name: '',
         email: '',
@@ -59,7 +57,7 @@ const Contact = () => {
 
             setStatus({
                 type: 'success',
-                text: 'Your connection request has been sent successfully. Thank you!'
+                text: 'Your message has been sent successfully. Thank you for connecting!'
             });
 
             // Reset form
@@ -82,68 +80,49 @@ const Contact = () => {
 
     return (
         <section style={{ padding: '80px 0' }}>
-            <div className="container" style={{ maxWidth: '800px' }}>
-                <h2 className="section-title">Contact Me</h2>
-                <p className="section-subtitle">Reach out for collaborations, project inquiries, or references</p>
-
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '48px', alignItems: 'start' }}>
-                    {/* Information Column */}
-                    <div>
-                        <h3 style={{ fontFamily: 'var(--font-serif)', fontSize: '1.6rem', marginBottom: '16px' }}>
-                            Let's Connect
-                        </h3>
-                        <p style={{ color: 'var(--text-secondary)', marginBottom: '24px', fontSize: '0.95rem', lineHeight: 1.6 }}>
-                            Whether you have a full-stack project idea, an internship opportunity, or generic academic questions, feel free to fill out the form or reach out directly via email.
-                        </p>
-
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-                            <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
-                                <div style={{ padding: '8px', backgroundColor: 'var(--bg-secondary)', border: '1px solid var(--border-color)' }}>
-                                    <Mail size={16} style={{ color: 'var(--text-primary)' }} />
-                                </div>
-                                <div>
-                                    <span style={{ display: 'block', fontSize: '0.75rem', textTransform: 'uppercase', color: 'var(--text-muted)', fontWeight: 600 }}>
-                                        Direct Email
-                                    </span>
-                                    <a href={`mailto:${profile?.email || 'wafaamjad058@gmail.com'}`} style={{ fontSize: '0.9rem', fontWeight: '500' }}>
-                                        {profile?.email || 'wafaamjad058@gmail.com'}
-                                    </a>
-                                </div>
-                            </div>
-                        </div>
+            <div className="container" style={{ maxWidth: '680px', margin: '0 auto' }}>
+                {/* Centered Header */}
+                <div style={{ textAlign: 'center', marginBottom: '40px' }}>
+                    <div style={{ display: 'inline-flex', padding: '12px', backgroundColor: 'var(--bg-secondary)', border: '1px solid var(--border-color)', marginBottom: '16px' }}>
+                        <MessageSquare size={28} style={{ color: 'var(--text-primary)' }} />
                     </div>
+                    <h2 className="section-title" style={{ marginBottom: '12px' }}>Let's Connect</h2>
+                    <p className="section-subtitle" style={{ maxWidth: '520px', margin: '0 auto' }}>
+                        Have a full-stack project idea, an internship opportunity, or testing feedback? Send a message directly below.
+                    </p>
+                </div>
 
-                    {/* Form Column */}
-                    <div>
-                        <form onSubmit={handleSubmit} style={{ border: '1px solid var(--border-color)', padding: '32px', backgroundColor: 'var(--bg-secondary)' }}>
+                {/* Form Container */}
+                <div style={{ border: '1px solid var(--border-color)', padding: '36px', backgroundColor: 'var(--bg-secondary)', boxShadow: '0 4px 20px rgba(0,0,0,0.03)' }}>
+                    <form onSubmit={handleSubmit}>
+                        {/* Alert Message Banner */}
+                        {status.text && (
+                            <div
+                                style={{
+                                    padding: '14px 16px',
+                                    marginBottom: '24px',
+                                    display: 'flex',
+                                    alignItems: 'flex-start',
+                                    gap: '10px',
+                                    fontSize: '0.9rem',
+                                    backgroundColor: status.type === 'success' ? '#f0fdf4' : '#fef2f2',
+                                    border: '1px solid',
+                                    borderColor: status.type === 'success' ? '#bbf7d0' : '#fecaca',
+                                    color: status.type === 'success' ? '#15803d' : '#991b1b'
+                                }}
+                            >
+                                {status.type === 'success' ? (
+                                    <CheckCircle size={18} style={{ marginTop: '2px', flexShrink: 0 }} />
+                                ) : (
+                                    <AlertCircle size={18} style={{ marginTop: '2px', flexShrink: 0 }} />
+                                )}
+                                <span>{status.text}</span>
+                            </div>
+                        )}
 
-                            {/* Alert Message Banner */}
-                            {status.text && (
-                                <div
-                                    style={{
-                                        padding: '12px 16px',
-                                        marginBottom: '20px',
-                                        display: 'flex',
-                                        alignItems: 'flex-start',
-                                        gap: '10px',
-                                        fontSize: '0.85rem',
-                                        backgroundColor: status.type === 'success' ? '#f0fdf4' : '#fef2f2',
-                                        border: '1px solid',
-                                        borderColor: status.type === 'success' ? '#bbf7d0' : '#fecaca',
-                                        color: status.type === 'success' ? '#15803d' : '#991b1b'
-                                    }}
-                                >
-                                    {status.type === 'success' ? (
-                                        <CheckCircle size={16} style={{ marginTop: '2px', flexShrink: 0 }} />
-                                    ) : (
-                                        <AlertCircle size={16} style={{ marginTop: '2px', flexShrink: 0 }} />
-                                    )}
-                                    <span>{status.text}</span>
-                                </div>
-                            )}
-
+                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }} className="form-grid-2">
                             <div className="form-group">
-                                <label className="form-label" htmlFor="name">Name</label>
+                                <label className="form-label" htmlFor="name">Name *</label>
                                 <input
                                     type="text"
                                     name="name"
@@ -153,11 +132,12 @@ const Contact = () => {
                                     value={formData.name}
                                     onChange={handleChange}
                                     placeholder="Your full name"
+                                    required
                                 />
                             </div>
 
                             <div className="form-group">
-                                <label className="form-label" htmlFor="email">Email</label>
+                                <label className="form-label" htmlFor="email">Email *</label>
                                 <input
                                     type="email"
                                     name="email"
@@ -167,57 +147,59 @@ const Contact = () => {
                                     value={formData.email}
                                     onChange={handleChange}
                                     placeholder="name@example.com"
+                                    required
                                 />
                             </div>
+                        </div>
 
-                            <div className="form-group">
-                                <label className="form-label" htmlFor="subject">Subject</label>
-                                <input
-                                    type="text"
-                                    name="subject"
-                                    id="subject"
-                                    className="form-control"
-                                    style={{ backgroundColor: '#fff' }}
-                                    value={formData.subject}
-                                    onChange={handleChange}
-                                    placeholder="Reason for contact"
-                                />
-                            </div>
+                        <div className="form-group">
+                            <label className="form-label" htmlFor="subject">Subject *</label>
+                            <input
+                                type="text"
+                                name="subject"
+                                id="subject"
+                                className="form-control"
+                                style={{ backgroundColor: '#fff' }}
+                                value={formData.subject}
+                                onChange={handleChange}
+                                placeholder="Reason for contacting"
+                                required
+                            />
+                        </div>
 
-                            <div className="form-group">
-                                <label className="form-label" htmlFor="message">Message</label>
-                                <textarea
-                                    name="message"
-                                    id="message"
-                                    rows="4"
-                                    className="form-control"
-                                    style={{ backgroundColor: '#fff', resize: 'vertical' }}
-                                    value={formData.message}
-                                    onChange={handleChange}
-                                    placeholder="Hi Wafa, I am writing to you because..."
-                                />
-                            </div>
+                        <div className="form-group">
+                            <label className="form-label" htmlFor="message">Message *</label>
+                            <textarea
+                                name="message"
+                                id="message"
+                                rows="5"
+                                className="form-control"
+                                style={{ backgroundColor: '#fff', resize: 'vertical' }}
+                                value={formData.message}
+                                onChange={handleChange}
+                                placeholder="Hi Wafa, I would like to discuss..."
+                                required
+                            />
+                        </div>
 
-                            <button
-                                type="submit"
-                                className="btn-primary"
-                                style={{ width: '100%', justifyContent: 'center' }}
-                                disabled={loading}
-                            >
-                                {loading ? 'Sending Message...' : <><Send size={14} /> Send Message</>}
-                            </button>
-                        </form>
-                    </div>
+                        <button
+                            type="submit"
+                            className="btn-primary"
+                            style={{ width: '100%', justifyContent: 'center', padding: '14px', fontSize: '0.95rem' }}
+                            disabled={loading}
+                        >
+                            {loading ? 'Sending Message...' : <><Send size={16} /> Send Message</>}
+                        </button>
+                    </form>
                 </div>
             </div>
             <style>{`
-        @media(max-width: 680px) {
-          div[style*="grid-template-columns: 1fr 1fr"] {
-            grid-template-columns: 1fr !important;
-            gap: 32px !important;
-          }
-        }
-      `}</style>
+                @media(max-width: 600px) {
+                    .form-grid-2 {
+                        grid-template-columns: 1fr !important;
+                    }
+                }
+            `}</style>
         </section>
     );
 };

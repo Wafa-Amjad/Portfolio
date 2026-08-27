@@ -118,10 +118,6 @@ const ProjectDetail = () => {
 
                             <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', fontSize: '0.85rem' }}>
                                 <div>
-                                    <span style={{ display: 'block', textTransform: 'uppercase', color: 'var(--text-muted)', fontWeight: 600, marginBottom: '2px' }}>Role</span>
-                                    <span style={{ fontWeight: '500', color: 'var(--text-primary)' }}>{project.role || 'Developer'}</span>
-                                </div>
-                                <div>
                                     <span style={{ display: 'block', textTransform: 'uppercase', color: 'var(--text-muted)', fontWeight: 600, marginBottom: '2px' }}>Database Eng</span>
                                     <span style={{ fontWeight: '500', color: 'var(--text-primary)', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
                                         <Database size={12} /> {project.database_tech || 'None'}

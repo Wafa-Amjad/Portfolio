@@ -10,6 +10,7 @@ export const PortfolioProvider = ({ children }) => {
     const [experience, setExperience] = useState([]);
     const [education, setEducation] = useState([]);
     const [certifications, setCertifications] = useState([]);
+    const [messages, setMessages] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
@@ -60,9 +61,24 @@ export const PortfolioProvider = ({ children }) => {
         }
     };
 
+    const fetchMessages = async () => {
+        if (!token) return;
+        try {
+            const msgData = await apiService.getMessages();
+            setMessages(Array.isArray(msgData) ? msgData : []);
+        } catch (err) {
+            console.error('Error fetching admin messages:', err);
+        }
+    };
+
     useEffect(() => {
         fetchPublicData();
-    }, []);
+        if (token) {
+            fetchMessages();
+        }
+    }, [token]);
+
+    const unreadCount = messages.filter(m => !m.read).length;
 
     const loginAdmin = async (email, password) => {
         try {
@@ -84,10 +100,14 @@ export const PortfolioProvider = ({ children }) => {
         localStorage.removeItem('adminUser');
         setToken(null);
         setUser(null);
+        setMessages([]);
     };
 
     const refreshData = async () => {
         await fetchPublicData();
+        if (token) {
+            await fetchMessages();
+        }
     };
 
     return (
@@ -99,13 +119,16 @@ export const PortfolioProvider = ({ children }) => {
                 experience,
                 education,
                 certifications,
+                messages,
+                unreadCount,
                 loading,
                 error,
                 token,
                 user,
                 loginAdmin,
                 logoutAdmin,
-                refreshData
+                refreshData,
+                fetchMessages
             }}
         >
             {children}
