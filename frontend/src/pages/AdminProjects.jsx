@@ -222,7 +222,7 @@ const AdminProjects = () => {
                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
                         <div className="form-group">
                             <label className="form-label">GitHub Repository URL (Optional)</label>
-                            <input type="url" name="github_url" className="form-control" value={formData.github_url} onChange={handleChange} placeholder="https://github.com/wafaamjad/..." />
+                            <input type="url" name="github_url" className="form-control" value={formData.github_url} onChange={handleChange} placeholder="https://github.com/Wafa-Amjad/..." />
                         </div>
 
                         <div className="form-group">

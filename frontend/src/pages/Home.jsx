@@ -46,10 +46,10 @@ const Home = () => {
                         <span style={{ fontSize: '0.8rem', textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 600, color: 'var(--text-muted)' }}>
                             Follow
                         </span>
-                        <a href={profile?.github_url || 'https://github.com/wafaamjad'} target="_blank" rel="noopener noreferrer" style={{ color: 'var(--text-primary)', display: 'inline-flex', alignItems: 'center', gap: '6px', fontSize: '0.9rem' }}>
+                        <a href={profile?.github_url || 'https://github.com/Wafa-Amjad'} target="_blank" rel="noopener noreferrer" style={{ color: 'var(--text-primary)', display: 'inline-flex', alignItems: 'center', gap: '6px', fontSize: '0.9rem' }}>
                             <Github size={16} /> GitHub
                         </a>
-                        <a href={profile?.linkedin_url || 'https://linkedin.com/in/wafaamjad'} target="_blank" rel="noopener noreferrer" style={{ color: 'var(--text-primary)', display: 'inline-flex', alignItems: 'center', gap: '6px', fontSize: '0.9rem' }}>
+                        <a href={profile?.linkedin_url || 'https://www.linkedin.com/in/wafa-a-639a78329/'} target="_blank" rel="noopener noreferrer" style={{ color: 'var(--text-primary)', display: 'inline-flex', alignItems: 'center', gap: '6px', fontSize: '0.9rem' }}>
                             <Linkedin size={16} /> LinkedIn
                         </a>
                     </div>

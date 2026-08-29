@@ -27,7 +27,7 @@ async function readLocalDb() {
                 bio: 'Building practical web and mobile applications using modern technologies.',
                 long_bio: 'I am Wafa Amjad, a Computer Science undergraduate at COMSATS University Islamabad, Abbottabad Campus. I specialize in designing and engineering practical web and mobile applications from concept to deployment.',
                 github_url: 'https://github.com/Wafa-Amjad',
-                linkedin_url: 'https://linkedin.com/in/wafa-amjad',
+                linkedin_url: 'https://www.linkedin.com/in/wafa-a-639a78329/',
                 resume_url: '',
                 profile_image: ''
             },
@@ -573,7 +573,7 @@ export const dbService = {
             }
         }
         const db = await readLocalDb();
-        return db.certifications || [];
+        return (db.certifications || []).filter(c => c && typeof c === 'object' && c.name);
     },
 
     createCertification: async (certData) => {
@@ -581,6 +581,7 @@ export const dbService = {
             name: sanitizeString(certData.name, 150),
             issuing_organization: sanitizeString(certData.issuing_organization, 150),
             issue_date: sanitizeString(certData.issue_date, 50),
+            expiration_date: sanitizeString(certData.expiration_date, 50),
             credential_id: sanitizeString(certData.credential_id, 100),
             credential_url: sanitizeUrl(certData.credential_url),
             image_url: sanitizeUrl(certData.image_url)
@@ -588,8 +589,17 @@ export const dbService = {
 
         if (isSupabaseActive()) {
             try {
-                const { data, error } = await supabase.from('certifications').insert([cleanCert]).select().single();
-                if (!error && data) return data;
+                // Supabase table columns: name, issuing_organization, issue_date, credential_id, credential_url, image_url
+                const supabaseCert = {
+                    name: cleanCert.name,
+                    issuing_organization: cleanCert.issuing_organization,
+                    issue_date: cleanCert.issue_date,
+                    credential_id: cleanCert.credential_id,
+                    credential_url: cleanCert.credential_url,
+                    image_url: cleanCert.image_url
+                };
+                const { data, error } = await supabase.from('certifications').insert([supabaseCert]).select().single();
+                if (!error && data) return { ...data, expiration_date: cleanCert.expiration_date };
                 console.warn('[Supabase] createCertification failed, saving locally:', error?.message);
             } catch (err) {
                 console.warn('[Supabase] createCertification unreachable, saving locally:', err.message);
@@ -598,6 +608,7 @@ export const dbService = {
 
         const db = await readLocalDb();
         if (!db.certifications) db.certifications = [];
+        db.certifications = db.certifications.filter(c => c && typeof c === 'object' && c.name);
         const newCert = {
             ...cleanCert,
             id: 'cert_' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6)
@@ -612,6 +623,7 @@ export const dbService = {
             name: sanitizeString(certData.name, 150),
             issuing_organization: sanitizeString(certData.issuing_organization, 150),
             issue_date: sanitizeString(certData.issue_date, 50),
+            expiration_date: sanitizeString(certData.expiration_date, 50),
             credential_id: sanitizeString(certData.credential_id, 100),
             credential_url: sanitizeUrl(certData.credential_url),
             image_url: sanitizeUrl(certData.image_url)
@@ -619,8 +631,16 @@ export const dbService = {
 
         if (isSupabaseActive()) {
             try {
-                const { data, error } = await supabase.from('certifications').update(cleanCert).eq('id', id).select().single();
-                if (!error && data) return data;
+                const supabaseCert = {
+                    name: cleanCert.name,
+                    issuing_organization: cleanCert.issuing_organization,
+                    issue_date: cleanCert.issue_date,
+                    credential_id: cleanCert.credential_id,
+                    credential_url: cleanCert.credential_url,
+                    image_url: cleanCert.image_url
+                };
+                const { data, error } = await supabase.from('certifications').update(supabaseCert).eq('id', id).select().single();
+                if (!error && data) return { ...data, expiration_date: cleanCert.expiration_date };
                 console.warn('[Supabase] updateCertification failed, updating locally:', error?.message);
             } catch (err) {
                 console.warn('[Supabase] updateCertification unreachable, updating locally:', err.message);
@@ -629,6 +649,7 @@ export const dbService = {
 
         const db = await readLocalDb();
         if (!db.certifications) db.certifications = [];
+        db.certifications = db.certifications.filter(c => c && typeof c === 'object' && c.name);
         const index = db.certifications.findIndex(c => c.id === id);
         if (index === -1) throw new Error('Certification not found');
         db.certifications[index] = {

@@ -172,10 +172,10 @@ const PublicLayout = () => {
                         </p>
                     </div>
                     <div style={{ display: 'flex', gap: '20px' }}>
-                        <a href={profile?.github_url || 'https://github.com/wafaamjad'} target="_blank" rel="noopener noreferrer" style={{ color: 'var(--text-secondary)' }}>
+                        <a href={profile?.github_url || 'https://github.com/Wafa-Amjad'} target="_blank" rel="noopener noreferrer" style={{ color: 'var(--text-secondary)' }}>
                             <Github size={20} />
                         </a>
-                        <a href={profile?.linkedin_url || 'https://linkedin.com/in/wafaamjad'} target="_blank" rel="noopener noreferrer" style={{ color: 'var(--text-secondary)' }}>
+                        <a href={profile?.linkedin_url || 'https://www.linkedin.com/in/wafa-a-639a78329/'} target="_blank" rel="noopener noreferrer" style={{ color: 'var(--text-secondary)' }}>
                             <Linkedin size={20} />
                         </a>
                         <a href={`mailto:${profile?.email || 'wafaamjad058@gmail.com'}`} style={{ color: 'var(--text-secondary)' }}>

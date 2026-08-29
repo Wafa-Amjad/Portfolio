@@ -21,7 +21,7 @@ export const createCertification = async (req, res) => {
         res.status(201).json(newCert);
     } catch (error) {
         console.error('[Certification Controller] createCertification error:', error.message);
-        res.status(500).json({ error: 'Failed to create certification' });
+        res.status(500).json({ error: error.message || 'Failed to create certification' });
     }
 };
 

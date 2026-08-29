@@ -54,7 +54,7 @@ const AdminCertifications = () => {
             resetForm();
         } catch (err) {
             console.error(err);
-            setError('Certification registry creation failed.');
+            setError(err.response?.data?.error || 'Certification registry creation failed.');
         } finally {
             setLoading(false);
         }

@@ -24,7 +24,7 @@
         "Algorithms"
       ],
       "image_url": "",
-      "github_url": "https://github.com/wafaamjad/password-validation",
+      "github_url": "https://github.com/Wafa-Amjad/password-validation",
       "live_url": "",
       "featured": false,
       "project_date": "2023-11-15",
@@ -49,7 +49,7 @@
         "Data Structures"
       ],
       "image_url": "",
-      "github_url": "https://github.com/wafaamjad/flight-reservation",
+      "github_url": "https://github.com/Wafa-Amjad/flight-reservation",
       "live_url": "",
       "featured": false,
       "project_date": "2024-01-10",
@@ -75,7 +75,7 @@
         "Java Swing"
       ],
       "image_url": "",
-      "github_url": "https://github.com/wafaamjad/blood-bank-management",
+      "github_url": "https://github.com/Wafa-Amjad/blood-bank-management",
       "live_url": "",
       "featured": false,
       "project_date": "2024-05-20",
@@ -102,7 +102,7 @@
         "CSS"
       ],
       "image_url": "",
-      "github_url": "https://github.com/wafaamjad/lost-and-found",
+      "github_url": "https://github.com/Wafa-Amjad/lost-and-found",
       "live_url": "",
       "featured": true,
       "project_date": "2025-12-10",
@@ -129,7 +129,7 @@
         "CSS"
       ],
       "image_url": "",
-      "github_url": "https://github.com/wafaamjad/quote-generator",
+      "github_url": "https://github.com/Wafa-Amjad/quote-generator",
       "live_url": "",
       "featured": false,
       "project_date": "2025-08-05",
@@ -156,7 +156,7 @@
         "CSS"
       ],
       "image_url": "",
-      "github_url": "https://github.com/wafaamjad/flashcard-quiz",
+      "github_url": "https://github.com/Wafa-Amjad/flashcard-quiz",
       "live_url": "",
       "featured": true,
       "project_date": "2025-08-20",
@@ -181,7 +181,7 @@
         "GUI Framework"
       ],
       "image_url": "",
-      "github_url": "https://github.com/wafaamjad/sudoku-python",
+      "github_url": "https://github.com/Wafa-Amjad/sudoku-python",
       "live_url": "",
       "featured": false,
       "project_date": "2024-04-18",
@@ -208,7 +208,7 @@
         "CSS"
       ],
       "image_url": "",
-      "github_url": "https://github.com/wafaamjad/campus-utility",
+      "github_url": "https://github.com/Wafa-Amjad/campus-utility",
       "live_url": "",
       "featured": true,
       "project_date": "2026-02-15",
@@ -235,7 +235,7 @@
         "Google Maps"
       ],
       "image_url": "",
-      "github_url": "https://github.com/wafaamjad/commutas",
+      "github_url": "https://github.com/Wafa-Amjad/commutas",
       "live_url": "",
       "featured": true,
       "project_date": "2025-10-30",
@@ -262,7 +262,7 @@
         "CSS"
       ],
       "image_url": "",
-      "github_url": "https://github.com/wafaamjad/campus-ride-sharing",
+      "github_url": "https://github.com/Wafa-Amjad/campus-ride-sharing",
       "live_url": "",
       "featured": true,
       "project_date": "2026-01-25",
@@ -274,25 +274,6 @@
       "role": "Backend Architect & Developer",
       "database_tech": "SQL Server",
       "project_type": "Internship Project"
-    },
-    {
-      "title": "Test Persist Project",
-      "short_description": "Test desc",
-      "detailed_description": "Detailed test",
-      "category": "Web App",
-      "technologies": [
-        "React"
-      ],
-      "image_url": "",
-      "github_url": "",
-      "live_url": "",
-      "featured": true,
-      "project_date": null,
-      "highlights": [],
-      "role": "",
-      "database_tech": "",
-      "project_type": "",
-      "id": "p_mtbu64us46o1"
     }
   ],
   "skills": [
@@ -543,25 +524,17 @@
       "location": "Pakistan"
     }
   ],
-  "certifications": [],
-  "messages": [
+  "certifications": [
     {
-      "name": "Test Visitor",
-      "email": "visitor@example.com",
-      "subject": "Inquiry",
-      "message": "Hello Wafa!",
-      "read": false,
-      "created_at": "2026-08-27T18:08:20.502Z",
-      "id": "m_mtbu64vd527l"
-    },
-    {
-      "name": "Wafa Amjad",
-      "email": "wafa85757@gmail.com",
-      "subject": "test",
-      "message": "hi",
-      "read": false,
-      "created_at": "2026-08-27T20:15:14.782Z",
-      "id": "m_mtbypc2ntjk0"
+      "id": "cert_mteb4v8b6giu",
+      "name": "Huawei HCIA–AI Certification",
+      "issuing_organization": "Huawei",
+      "issue_date": "Oct , 2025",
+      "expiration_date": "Oct , 2028",
+      "credential_id": "",
+      "credential_url": "https://www.linkedin.com/posts/wafa-a-639a78329_huawei-ai-hciaai-activity-7386814456481247232-YfsK?utm_source=share&utm_medium=member_desktop&rcm=ACoAAFLq-I0B8BJvGCbXxgfES_nVGw4cqZgfun4",
+      "image_url": ""
     }
-  ]
+  ],
+  "messages": []
 }
