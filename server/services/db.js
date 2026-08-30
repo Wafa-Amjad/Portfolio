@@ -683,17 +683,33 @@ export const dbService = {
 
     // -- MESSAGES --
     getMessages: async () => {
+        let supabaseMessages = [];
         if (isSupabaseActive()) {
             try {
                 const { data, error } = await supabase.from('messages').select('*').order('created_at', { ascending: false });
-                if (!error && data) return data;
-                if (error) console.warn('[Supabase] getMessages error, using local DB:', error.message);
+                if (!error && Array.isArray(data)) {
+                    supabaseMessages = data;
+                } else if (error) {
+                    console.warn('[Supabase] getMessages warning:', error.message);
+                }
             } catch (err) {
-                console.warn('[Supabase] getMessages unreachable, using local DB:', err.message);
+                console.warn('[Supabase] getMessages exception:', err.message);
             }
         }
         const db = await readLocalDb();
-        return [...(db.messages || [])].sort((a, b) => new Date(b.created_at || 0) - new Date(a.created_at || 0));
+        const localMessages = db.messages || [];
+
+        // Merge Supabase and Local db.json messages cleanly
+        const combinedMap = new Map();
+        [...localMessages, ...supabaseMessages].forEach(msg => {
+            if (msg && (msg.id || msg.created_at)) {
+                const key = msg.id || `${msg.email}_${msg.created_at}`;
+                combinedMap.set(key, msg);
+            }
+        });
+
+        const merged = Array.from(combinedMap.values()).sort((a, b) => new Date(b.created_at || 0) - new Date(a.created_at || 0));
+        return merged;
     },
 
     createMessage: async (messageData) => {
@@ -706,24 +722,36 @@ export const dbService = {
             created_at: new Date().toISOString()
         };
 
+        let resultMessage = null;
+
         if (isSupabaseActive()) {
             try {
                 const { data, error } = await supabase.from('messages').insert([enrichedMessage]).select().single();
-                if (!error && data) return data;
-                console.warn('[Supabase] createMessage failed, saving locally:', error?.message);
+                if (!error && data) {
+                    resultMessage = data;
+                } else {
+                    console.warn('[Supabase] createMessage warning:', error?.message);
+                }
             } catch (err) {
-                console.warn('[Supabase] createMessage unreachable, saving locally:', err.message);
+                console.warn('[Supabase] createMessage exception:', err.message);
             }
         }
 
+        // Always sync a copy to local db.json
         const db = await readLocalDb();
         if (!db.messages) db.messages = [];
-        const newMsg = {
+        const newMsg = resultMessage || {
             ...enrichedMessage,
             id: 'm_' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6)
         };
-        db.messages.push(newMsg);
-        await writeLocalDb(db);
+        
+        // Prevent duplicate entries in local db.json
+        const exists = db.messages.some(m => m.id === newMsg.id || (m.email === newMsg.email && m.created_at === newMsg.created_at));
+        if (!exists) {
+            db.messages.push(newMsg);
+            await writeLocalDb(db);
+        }
+
         return newMsg;
     },
 
