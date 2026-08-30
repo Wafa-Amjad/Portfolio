@@ -87,27 +87,6 @@ const About = () => {
                                     BS CS (Undergrad)
                                 </span>
                             </div>
-
-                            <div>
-                                <span style={{ display: 'block', fontSize: '0.75rem', textTransform: 'uppercase', color: 'var(--text-muted)', fontWeight: 600, marginBottom: '4px' }}>
-                                    Resume
-                                </span>
-                                <a
-                                    href={profile?.resume_url || '#'}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="btn-secondary"
-                                    style={{
-                                        padding: '8px 12px',
-                                        fontSize: '0.75rem',
-                                        width: '100%',
-                                        justifyContent: 'center',
-                                        marginTop: '4px'
-                                    }}
-                                >
-                                    <FileText size={14} /> View CV / Resume
-                                </a>
-                            </div>
                         </div>
                     </div>
                 </div>

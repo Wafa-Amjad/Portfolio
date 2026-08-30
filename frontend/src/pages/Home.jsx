@@ -22,7 +22,7 @@ const Home = () => {
                     <p style={{ textTransform: 'uppercase', letterSpacing: '0.15em', fontSize: '0.85rem', fontWeight: 600, color: 'var(--text-muted)', marginBottom: '16px' }}>
                         Available for Professional Opportunities
                     </p>
-                    <h1 style={{ fontSize: '4.5rem', fontWeight: 700, letterSpacing: '-0.02em', marginBottom: '24px', lineHeight: 1.1 }}>
+                    <h1 style={{ fontSize: 'clamp(2.2rem, 8vw, 4.5rem)', fontWeight: 700, letterSpacing: '-0.02em', marginBottom: '24px', lineHeight: 1.1, whiteSpace: 'nowrap' }}>
                         {profile?.name || 'WAFA AMJAD'}
                     </h1>
                     <h2 style={{ fontFamily: 'var(--font-sans)', fontSize: '1.5rem', fontWeight: 400, color: 'var(--text-secondary)', marginBottom: '32px', maxWidth: '750px', lineHeight: 1.4 }}>

@@ -64,25 +64,6 @@ const PublicLayout = () => {
                             </li>
                         </ul>
 
-                        {/* Resume button */}
-                        <a
-                            href={profile?.resume_url || '#'}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="btn-secondary"
-                            style={{
-                                marginLeft: '24px',
-                                padding: '8px 16px',
-                                fontSize: '0.8rem',
-                                borderWidth: '1px',
-                                display: 'inline-flex',
-                                alignItems: 'center',
-                                gap: '4px'
-                            }}
-                        >
-                            Resume <ArrowUpRight size={14} />
-                        </a>
-
                         {/* Mobile Menu Trigger */}
                         <button
                             onClick={toggleMobileMenu}
@@ -138,21 +119,6 @@ const PublicLayout = () => {
                         <NavLink to="/contact" className="nav-link" style={{ padding: '12px 0' }} onClick={closeMobileMenu}>
                             Contact
                         </NavLink>
-                        <a
-                            href={profile?.resume_url || '#'}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="btn-secondary"
-                            style={{
-                                marginTop: '16px',
-                                textAlign: 'center',
-                                justifyContent: 'center',
-                                padding: '10px'
-                            }}
-                            onClick={closeMobileMenu}
-                        >
-                            View Resume <ArrowUpRight size={14} />
-                        </a>
                     </div>
                 )}
             </header>
