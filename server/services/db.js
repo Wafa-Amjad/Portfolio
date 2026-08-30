@@ -28,7 +28,7 @@ async function readLocalDb() {
                 long_bio: 'I am Wafa Amjad, a Computer Science undergraduate at COMSATS University Islamabad, Abbottabad Campus. I specialize in designing and engineering practical web and mobile applications from concept to deployment.',
                 github_url: 'https://github.com/Wafa-Amjad',
                 linkedin_url: 'https://www.linkedin.com/in/wafa-a-639a78329/',
-                resume_url: '',
+                resume_url: '/Wafa_Amjad_CV.pdf',
                 profile_image: ''
             },
             projects: [],
